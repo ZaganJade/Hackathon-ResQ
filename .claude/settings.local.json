@@ -7,7 +7,9 @@
       "Bash(composer create-project:*)",
       "Bash(php artisan:*)",
       "Bash(openspec list:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

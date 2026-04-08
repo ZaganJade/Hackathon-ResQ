@@ -218,3 +218,96 @@
 - [ ] 16.6 Document environment variable requirements
 - [ ] 16.7 Write troubleshooting guide
 - [ ] 16.8 Create contribution guidelines for developers
+
+## 17. CSS Design & UI Enhancement (Modern Minimalist - Nature Theme)
+
+### 17.1 Design System Foundation
+- [x] 17.1.1 Define nature-inspired color palette (primary: emerald-600, secondary: teal-500, accent: lime-400, neutral: slate-50/100/200)
+- [x] 17.1.2 Configure Poppins font family in Tailwind ( headings: font-semibold/bold, body: font-normal )
+- [x] 17.1.3 Create CSS custom properties (variables) untuk colors, spacing, shadows
+- [x] 17.1.4 Define border radius system (rounded-2xl untuk cards, rounded-full untuk pills/buttons)
+- [x] 17.1.5 Set up shadow system (soft shadows: shadow-lg dengan emerald tint untuk depth)
+- [x] 17.1.6 Create spacing scale consistent (4px base: 4, 8, 16, 24, 32, 48, 64)
+
+### 17.2 Typography System
+- [x] 17.2.1 Configure Poppins weights (300-light, 400-regular, 500-medium, 600-semibold, 700-bold)
+- [x] 17.2.2 Define heading hierarchy (H1: 48px/bold, H2: 36px/semibold, H3: 24px/semibold, H4: 20px/medium)
+- [x] 17.2.3 Set body text sizes (base: 16px/24px line-height, small: 14px, tiny: 12px)
+- [x] 17.2.4 Create typography utilities (text-balance untuk headings, leading-relaxed untuk body)
+- [x] 17.2.5 Add accent text colors (text-emerald-700 untuk emphasis, text-teal-600 untuk links)
+
+### 17.3 Animation & Entrance System
+- [x] 17.3.1 Create fade-up entrance animation (opacity 0→1, translateY 24px→0, duration 600ms, ease-out)
+- [x] 17.3.2 Implement stagger children pattern (delay 100ms antara items, max 500ms total)
+- [x] 17.3.3 Add blur-to-focus effect untuk hero sections (blur 8px→0px)
+- [x] 17.3.4 Create soft scale animation untuk cards (scale 0.95→1)
+- [ ] 17.3.5 Implement scroll-triggered animations dengan Intersection Observer
+- [x] 17.3.6 Add loading skeleton screens (shimmer effect dengan emerald gradient)
+- [x] 17.3.7 Create smooth page transitions (fade 300ms antara routes)
+- [x] 17.3.8 Add micro-interactions (button hover: scale 1.02, card hover: translateY -4px + shadow increase)
+
+### 17.4 Component Library
+- [x] 17.4.1 Design primary button (emerald-600 bg, white text, rounded-full, hover: emerald-700, transition 200ms)
+- [x] 17.4.2 Design secondary button (white bg, emerald-600 border, rounded-full, hover: emerald-50)
+- [x] 17.4.3 Create card component (white bg, rounded-2xl, soft shadow, hover lift effect)
+- [x] 17.4.4 Design form inputs (slate-100 bg, rounded-xl, focus: emerald-500 ring, transition)
+- [x] 17.4.5 Create badge components (status: success=emerald, warning=amber, danger=rose, info=sky)
+- [x] 17.4.6 Design alert/notification boxes (left border accent, rounded-xl, dengan icon)
+- [x] 17.4.7 Build modal/dialog styles (overlay backdrop-blur, centered card, rounded-2xl)
+- [x] 17.4.8 Create navigation styles (clean navbar dengan subtle shadow, active state indicator)
+
+### 17.5 Iconography (Lucide)
+- [x] 17.5.1 Integrate Lucide icon library (outline style, stroke-width 1.5-2)
+- [ ] 17.5.2 Create disaster type icon mapping (flood: Waves, earthquake: Activity, fire: Flame, etc)
+- [x] 17.5.3 Design severity indicators (pulsing dot animation untuk high severity)
+- [ ] 17.5.4 Create custom nature-themed icons jika diperlukan (leaf, tree, water elements)
+- [x] 17.5.5 Set icon sizes (sm: 16px, md: 20px, lg: 24px, xl: 32px)
+
+### 17.6 Page-Specific UI Polish
+
+#### 17.6.1 AI Chat Interface
+- [x] 17.6.1.1 Style message bubbles (user: emerald-600 bg, ai: white bg dengan emerald border)
+- [x] 17.6.1.2 Add typing indicator animation (3 bouncing dots)
+- [x] 17.6.1.3 Design chat input area (rounded-full dengan send button inside)
+- [ ] 17.6.1.4 Create conversation list sidebar (clean, active highlight)
+
+#### 17.6.2 Disaster Map
+- [ ] 17.6.2.1 Style custom map markers (nature icons dengan severity colors)
+- [ ] 17.6.2.2 Design info window cards (rounded-xl, shadow-lg, clean typography)
+- [ ] 17.6.2.3 Create filter panel UI (chips dengan check animation, rounded-full)
+- [ ] 17.6.2.4 Add location search bar styling (floating, rounded-full, dengan icon)
+
+#### 17.6.3 User Dashboard (Redesigned)
+- [x] 17.6.3.1 Design stat cards (large number typography, subtle trend indicators)
+- [x] 17.6.3.2 Create chart containers (rounded-2xl, soft shadow)
+- [x] 17.6.3.3 Style data tables (clean rows, hover state, rounded corners)
+- [x] 17.6.3.4 Design quick action buttons (icon + text, compact)
+
+#### 17.6.4 Content Pages (Articles & Guides)
+- [ ] 17.6.4.1 Style article cards (image top, content bottom, hover lift)
+- [ ] 17.6.4.2 Design article detail typography (prose-lg, proper spacing)
+- [ ] 17.6.4.3 Create step-by-step guide layout (numbered steps, visual connectors)
+- [ ] 17.6.4.4 Add category filter pills (scrollable horizontal, active state)
+
+#### 17.6.5 Empty & Error States
+- [ ] 17.6.5.1 Create empty state illustrations (nature-themed SVG, soft colors)
+- [ ] 17.6.5.2 Design 404 page (nature illustration, clear CTA button)
+- [ ] 17.6.5.3 Style error alerts (rose colors, clear message, retry action)
+- [ ] 17.6.5.4 Add loading spinners (emerald themed, smooth animation)
+
+### 17.7 Responsive & Mobile-First
+- [ ] 17.7.1 Implement mobile-first breakpoints (base → sm:640px → md:768px → lg:1024px → xl:1280px)
+- [ ] 17.7.2 Create mobile navigation (bottom sheet atau hamburger menu)
+- [ ] 17.7.3 Optimize touch targets (min 44px height untuk buttons, 48px untuk nav)
+- [ ] 17.7.4 Adjust typography untuk mobile (H1: 32px, H2: 24px, body: 16px)
+- [ ] 17.7.5 Stack layouts untuk mobile (single column, full-width cards)
+- [ ] 17.7.6 Simplify map controls untuk mobile (collapsed filters, floating action button)
+- [ ] 17.7.7 Test pada real devices (iOS Safari, Android Chrome)
+
+### 17.8 Accessibility & Polish
+- [ ] 17.8.1 Ensure color contrast WCAG 2.1 AA (minimal 4.5:1 untuk text)
+- [ ] 17.8.2 Add focus visible styles (emerald ring outline, offset 2px)
+- [ ] 17.8.3 Implement reduced-motion support (respect prefers-reduced-motion)
+- [ ] 17.8.4 Add ARIA labels untuk semua interactive elements
+- [ ] 17.8.5 Test keyboard navigation flow (tab order logical, visible focus)
+- [ ] 17.8.6 Create print styles untuk articles/guides (clean, no background colors)
