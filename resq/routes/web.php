@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\AIAssistController;
 use App\Http\Controllers\ApiStatusController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChatHistoryController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\MitigationController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,10 +16,16 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('home.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Content listing routes
+    Route::get('/home', [HomeController::class, 'index'])->name('home.index');
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/mitigations', [MitigationController::class, 'index'])->name('mitigations.index');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.notifications');
