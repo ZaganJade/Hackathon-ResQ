@@ -15,22 +15,14 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-slate-50">
-        <div class="min-h-screen">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow-soft border-b border-slate-100 animate-fade-in">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
+        <div class="min-h-screen flex flex-col pb-16 lg:pb-0">
             <!-- Page Content -->
-            <main class="page-transition">
+            <main class="flex-1 page-transition">
                 {{ $slot }}
             </main>
+
+            <!-- Mobile Bottom Navigation Component (reusable) -->
+            <x-mobile-bottom-nav />
         </div>
 
         <!-- AI Chatbot Floating Widget -->
