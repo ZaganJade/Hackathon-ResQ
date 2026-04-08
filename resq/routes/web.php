@@ -3,6 +3,7 @@
 use App\Http\Controllers\AIAssistController;
 use App\Http\Controllers\ApiStatusController;
 use App\Http\Controllers\ChatHistoryController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/notifications', [ProfileController::class, 'updateNotifications'])->name('profile.notifications');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // AI Assist Routes
@@ -35,15 +37,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat-history/{conversationId}/restore', [ChatHistoryController::class, 'restore'])->name('chat-history.restore');
     Route::get('/chat-history/{conversationId}/export', [ChatHistoryController::class, 'export'])->name('chat-history.export');
 
-    // API Status Routes (Task 13) - Admin only
-    Route::prefix('admin/api-status')->middleware(['auth', 'admin'])->group(function () {
-        Route::get('/', [ApiStatusController::class, 'index']);
-        Route::get('/circuit', [ApiStatusController::class, 'circuitStatus']);
-        Route::post('/circuit/{service}/{action}', [ApiStatusController::class, 'controlCircuit']);
-    });
+    // Disaster Map Routes (Task 7)
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
 });
 
-// Public health check endpoint
-Route::get('/api/health', [ApiStatusController::class, 'health']);
+// Map API Routes (public)
+Route::get('/api/disasters', [MapController::class, 'getDisasters'])->name('api.disasters.index');
+Route::get('/api/disasters/stats', [MapController::class, 'getStats'])->name('api.disasters.stats');
+Route::get('/api/disasters/{disaster}', [MapController::class, 'show'])->name('api.disasters.show');
+Route::get('/api/geocode', [MapController::class, 'geocode'])->name('api.geocode');
 
 require __DIR__.'/auth.php';
+

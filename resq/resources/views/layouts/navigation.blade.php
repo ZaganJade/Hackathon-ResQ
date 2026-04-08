@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('chat-history.index')" :active="request()->routeIs('chat-history.*')">
                         {{ __('Riwayat Chat') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('map.index')" :active="request()->routeIs('map.*')">
+                        {{ __('Peta Bencana') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -81,6 +84,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('chat-history.index')" :active="request()->routeIs('chat-history.*')">
                 {{ __('Riwayat Chat') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('map.index')" :active="request()->routeIs('map.*')">
+                {{ __('Peta Bencana') }}
             </x-responsive-nav-link>
         </div>
 
