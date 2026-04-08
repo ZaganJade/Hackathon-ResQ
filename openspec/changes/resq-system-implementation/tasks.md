@@ -147,9 +147,9 @@
 - [x] 12.3 Implement responsive navigation menu
 - [x] 12.4 Create homepage with feature overview
 - [x] 12.5 Design and implement AI chat interface
-- [ ] 12.6 Style disaster map page with filters panel
-- [ ] 12.7 Create article listing and detail page layouts
-- [ ] 12.8 Implement guide category and detail views
+- [x] 12.6 Style disaster map page with filters panel
+- [x] 12.7 Create article listing and detail page layouts
+- [x] 12.8 Implement guide category and detail views
 - [x] 12.9 Add user profile and notification settings page
 - [ ] 12.10 Implement admin dashboard layout
 - [x] 12.11 Add Indonesian language localization files

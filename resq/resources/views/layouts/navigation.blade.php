@@ -24,6 +24,12 @@
                     <x-nav-link :href="route('map.index')" :active="request()->routeIs('map.*')">
                         {{ __('Peta Bencana') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('articles.index')" :active="request()->routeIs('articles.*')">
+                        {{ __('Artikel') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
+                        {{ __('Panduan') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -87,6 +93,12 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('map.index')" :active="request()->routeIs('map.*')">
                 {{ __('Peta Bencana') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('articles.index')" :active="request()->routeIs('articles.*')">
+                {{ __('Artikel') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
+                {{ __('Panduan') }}
             </x-responsive-nav-link>
         </div>
 

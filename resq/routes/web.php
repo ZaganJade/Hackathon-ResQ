@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AIAssistController;
 use App\Http\Controllers\ApiStatusController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ChatHistoryController;
+use App\Http\Controllers\GuideController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +41,16 @@ Route::middleware('auth')->group(function () {
 
     // Disaster Map Routes (Task 7)
     Route::get('/map', [MapController::class, 'index'])->name('map.index');
+
+    // Article Routes (Task 12.7)
+    Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+    Route::get('/articles/category/{category}', [ArticleController::class, 'category'])->name('articles.category');
+    Route::get('/articles/{slug}', [ArticleController::class, 'show'])->name('articles.show');
+
+    // Guide Routes (Task 12.8)
+    Route::get('/guides', [GuideController::class, 'index'])->name('guides.index');
+    Route::get('/guides/category/{category}', [GuideController::class, 'category'])->name('guides.category');
+    Route::get('/guides/{slug}', [GuideController::class, 'show'])->name('guides.show');
 });
 
 // Map API Routes (public)
