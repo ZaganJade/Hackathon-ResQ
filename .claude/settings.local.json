@@ -7,7 +7,9 @@
       "Bash(composer create-project:*)",
       "Bash(php artisan:*)",
       "Bash(openspec list:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(chmod +x resq/scripts/queue-worker.sh)",
+      "Bash(php -m)"
     ]
   }
 }
