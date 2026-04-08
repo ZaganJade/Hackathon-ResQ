@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AIAssistController;
+use App\Http\Controllers\ApiStatusController;
 use App\Http\Controllers\ChatHistoryController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
