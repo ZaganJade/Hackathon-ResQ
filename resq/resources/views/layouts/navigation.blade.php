@@ -19,12 +19,6 @@
                         </svg>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('ai-assist.index')" :active="request()->routeIs('ai-assist.*')">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                        </svg>
-                        {{ __('AI Assist') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('chat-history.index')" :active="request()->routeIs('chat-history.*')">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -110,9 +104,6 @@
         <div class="pt-2 pb-3 space-y-1 px-4">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('ai-assist.index')" :active="request()->routeIs('ai-assist.*')">
-                {{ __('AI Assist') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('chat-history.index')" :active="request()->routeIs('chat-history.*')">
                 {{ __('Riwayat Chat') }}

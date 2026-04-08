@@ -32,5 +32,10 @@
                 {{ $slot }}
             </main>
         </div>
+
+        <!-- AI Chatbot Floating Widget -->
+        @auth
+            <x-ai-chatbot />
+        @endauth
     </body>
 </html>
