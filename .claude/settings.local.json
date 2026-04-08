@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openspec new:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec instructions:*)",
+      "Bash(composer create-project:*)",
+      "Bash(php artisan:*)",
+      "Bash(openspec list:*)",
+      "Bash(composer require:*)"
+    ]
+  }
+}
