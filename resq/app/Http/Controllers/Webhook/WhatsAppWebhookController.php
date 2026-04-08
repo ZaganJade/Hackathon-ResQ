@@ -248,4 +248,164 @@ class WhatsAppWebhookController extends Controller
 
         return $message;
     }
+
+    /**
+     * Send WhatsApp notification to ALL registered users (broadcast)
+     *
+     * POST /api/v1/webhook/whatsapp/broadcast
+     *
+     * Headers:
+     * - X-API-Key: your_webhook_api_key
+     * - Content-Type: application/json
+     *
+     * Body:
+     * {
+     *   "message": "Peringatan gempa magnitude 6.0 di Jakarta!",
+     *   "disaster_type": "earthquake",
+     *   "location": "Jakarta",
+     *   "severity": "high",
+     *   "filter_type": "earthquake" // optional: filter by disaster type
+     * }
+     */
+    public function broadcast(Request $request): JsonResponse
+    {
+        // Rate limiting: max 10 broadcast requests per hour per API key
+        $apiKey = $request->header('X-API-Key');
+        $rateLimitKey = 'webhook:whatsapp:broadcast:' . ($apiKey ?? 'unknown');
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 10)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Broadcast rate limit exceeded. Max 10 broadcasts per hour.',
+                'retry_after' => RateLimiter::availableIn($rateLimitKey),
+            ], 429);
+        }
+
+        RateLimiter::hit($rateLimitKey, 3600); // 1 hour window
+
+        // Authenticate webhook request
+        if (!$this->authenticate($request)) {
+            Log::warning('Unauthorized broadcast attempt', [
+                'ip' => $request->ip(),
+                'headers' => $request->headers->all(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized. Invalid or missing X-API-Key header.',
+            ], 401);
+        }
+
+        // Validate request
+        try {
+            $validated = $request->validate([
+                'message' => 'required|string|min:1|max:2000',
+                'disaster_type' => 'nullable|string|max:50',
+                'location' => 'nullable|string|max:200',
+                'severity' => 'nullable|string|in:low,medium,high,critical',
+                'filter_type' => 'nullable|string|max:50', // Filter by subscribed disaster type
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Validation failed',
+                'details' => $e->errors(),
+            ], 422);
+        }
+
+        // Get all active notification preferences
+        $query = \App\Models\NotificationPreference::active();
+
+        // Filter by disaster type if specified
+        if (!empty($validated['filter_type'])) {
+            $disasterType = $validated['filter_type'];
+            $preferences = $query->get()->filter(function ($pref) use ($disasterType) {
+                return $pref->isSubscribedTo($disasterType);
+            });
+        } else {
+            $preferences = $query->get();
+        }
+
+        if ($preferences->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'No active subscribers found.',
+            ], 404);
+        }
+
+        // Build message
+        $message = $this->buildMessage($validated);
+
+        // Send to all users
+        $results = [
+            'total' => $preferences->count(),
+            'sent' => 0,
+            'failed' => 0,
+            'errors' => [],
+        ];
+
+        $startTime = microtime(true);
+
+        foreach ($preferences as $preference) {
+            try {
+                $phone = $this->whatsAppService->normalizePhoneNumber($preference->whatsapp_number);
+
+                // Validate phone
+                if (!$this->whatsAppService->validatePhoneNumber($phone)) {
+                    $results['errors'][] = [
+                        'phone' => $preference->whatsapp_number,
+                        'error' => 'Invalid phone number',
+                    ];
+                    $results['failed']++;
+                    continue;
+                }
+
+                // Send message
+                $result = $this->whatsAppService->send($phone, $message);
+                $results['sent']++;
+
+                // Add small delay to avoid rate limiting
+                usleep(100000); // 100ms delay between messages
+
+            } catch (\Throwable $e) {
+                $results['errors'][] = [
+                    'phone' => $preference->whatsapp_number,
+                    'error' => $e->getMessage(),
+                ];
+                $results['failed']++;
+
+                Log::error('Broadcast failed for user', [
+                    'user_id' => $preference->user_id,
+                    'phone' => $preference->whatsapp_number,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $totalTime = round((microtime(true) - $startTime) * 1000, 2);
+
+        // Log broadcast
+        Log::info('WhatsApp broadcast completed', [
+            'total' => $results['total'],
+            'sent' => $results['sent'],
+            'failed' => $results['failed'],
+            'total_time_ms' => $totalTime,
+            'ip' => $request->ip(),
+        ]);
+
+        return response()->json([
+            'success' => $results['sent'] > 0,
+            'data' => [
+                'total_subscribers' => $results['total'],
+                'sent' => $results['sent'],
+                'failed' => $results['failed'],
+                'success_rate' => $results['total'] > 0 ? round(($results['sent'] / $results['total']) * 100, 2) : 0,
+            ],
+            'errors' => $results['errors'] ?: null,
+            'meta' => [
+                'total_time_ms' => $totalTime,
+                'timestamp' => now()->toIso8601String(),
+            ],
+        ], $results['sent'] > 0 ? 200 : 500);
+    }
 }

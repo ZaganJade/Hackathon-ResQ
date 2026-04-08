@@ -14,9 +14,13 @@ Route::prefix('v1/webhook')->group(function () {
 
     // WhatsApp notification endpoints
     Route::prefix('whatsapp')->group(function () {
-        // Send WhatsApp message (POST)
+        // Send WhatsApp message to single number (POST)
         Route::post('/send', [WhatsAppWebhookController::class, 'send'])
             ->name('api.webhook.whatsapp.send');
+
+        // Broadcast WhatsApp message to all subscribers (POST)
+        Route::post('/broadcast', [WhatsAppWebhookController::class, 'broadcast'])
+            ->name('api.webhook.whatsapp.broadcast');
 
         // Check service status (GET)
         Route::get('/status', [WhatsAppWebhookController::class, 'status'])

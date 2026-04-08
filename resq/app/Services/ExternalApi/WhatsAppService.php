@@ -461,8 +461,8 @@ class WhatsAppService extends BaseApiClient
         $normalized = $this->normalizePhoneNumber($phone);
 
         // Check if it's a valid Indonesian number
-        // Should start with 62 and have 10-13 digits total
-        return preg_match('/^62[0-9]{9,11}$/', $normalized) === 1;
+        // Should start with 62 and have 10-14 digits total (support 13-14 digit numbers)
+        return preg_match('/^62[0-9]{9,12}$/', $normalized) === 1;
     }
 
     /**
