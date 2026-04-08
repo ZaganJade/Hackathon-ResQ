@@ -68,19 +68,19 @@
 
 ## 7. Disaster Map Implementation
 
-- [x] 7.1 Create `MapController` with index and API endpoints
-- [x] 7.2 Implement `GeoService` for coordinate calculations and geocoding
-- [x] 7.3 Create `/api/disasters` endpoint returning GeoJSON format
-- [x] 7.4 Add filtering by disaster type, severity, and date range
-- [x] 7.5 Implement radius search for location-based queries
-- [x] 7.6 Create Blade view with Google Maps JavaScript API integration
-- [x] 7.7 Implement marker clustering for performance
-- [x] 7.8 Add info windows with disaster details on marker click
-- [x] 7.9 Implement auto-refresh mechanism (5-minute interval)
-- [x] 7.10 Create disaster type filter UI with checkboxes
-- [x] 7.11 Add location search box with geocoding
-- [x] 7.12 Implement severity-based marker colors (red/yellow/green)
-- [x] 7.13 Write integration tests for map API endpoints
+- [ ] 7.1 Create `MapController` with index and API endpoints
+- [ ] 7.2 Implement `GeoService` for coordinate calculations and geocoding
+- [ ] 7.3 Create `/api/disasters` endpoint returning GeoJSON format
+- [ ] 7.4 Add filtering by disaster type, severity, and date range
+- [ ] 7.5 Implement radius search for location-based queries
+- [ ] 7.6 Create Blade view with Google Maps JavaScript API integration
+- [ ] 7.7 Implement marker clustering for performance
+- [ ] 7.8 Add info windows with disaster details on marker click
+- [ ] 7.8 Implement auto-refresh mechanism (5-minute interval)
+- [ ] 7.9 Create disaster type filter UI with checkboxes
+- [ ] 7.10 Add location search box with geocoding
+- [ ] 7.11 Implement severity-based marker colors (red/yellow/green)
+- [ ] 7.12 Write integration tests for map API endpoints
 
 ## 8. Disaster Management (Admin)
 
@@ -97,19 +97,19 @@
 
 ## 9. WhatsApp Notification Service
 
-- [x] 9.1 Create `NotificationService` class with WhatsApp Web API integration
-- [x] 9.2 Implement HTTP client configuration for WhatsApp API
-- [x] 9.3 Create queue job for sending notifications
-- [x] 9.4 Add exponential backoff retry logic for failed sends
-- [x] 9.5 Implement notification template system for different disaster types
-- [x] 9.6 Create notification preference management UI
-- [x] 9.7 Add phone number validation and format normalization
-- [x] 9.8 Implement opt-in confirmation message sending
-- [x] 9.9 Create disaster-triggered notification logic
-- [x] 9.10 Add proximity-based notification filtering
-- [x] 9.11 Implement rate limiting and bulk sending optimization
-- [x] 9.12 Create notification logs view for admin monitoring
-- [x] 9.13 Write tests for notification service with mocked API
+- [ ] 9.1 Create `NotificationService` class with WhatsApp Web API integration
+- [ ] 9.2 Implement HTTP client configuration for WhatsApp API
+- [ ] 9.3 Create queue job for sending notifications
+- [ ] 9.4 Add exponential backoff retry logic for failed sends
+- [ ] 9.5 Implement notification template system for different disaster types
+- [ ] 9.6 Create notification preference management UI
+- [ ] 9.7 Add phone number validation and format normalization
+- [ ] 9.8 Implement opt-in confirmation message sending
+- [ ] 9.9 Create disaster-triggered notification logic
+- [ ] 9.10 Add proximity-based notification filtering
+- [ ] 9.11 Implement rate limiting and bulk sending optimization
+- [ ] 9.12 Create notification logs view for admin monitoring
+- [ ] 9.13 Write tests for notification service with mocked API
 
 ## 10. Mitigation Content Management
 
@@ -142,18 +142,18 @@
 
 ## 12. Frontend Implementation
 
-- [ ] 12.1 Set up Tailwind CSS
-- [ ] 12.2 Create master layout with navigation and footer
-- [ ] 12.3 Implement responsive navigation menu
-- [ ] 12.4 Create homepage with feature overview
-- [ ] 12.5 Design and implement AI chat interface
+- [x] 12.1 Set up Tailwind CSS
+- [x] 12.2 Create master layout with navigation and footer
+- [x] 12.3 Implement responsive navigation menu
+- [x] 12.4 Create homepage with feature overview
+- [x] 12.5 Design and implement AI chat interface
 - [ ] 12.6 Style disaster map page with filters panel
 - [ ] 12.7 Create article listing and detail page layouts
 - [ ] 12.8 Implement guide category and detail views
-- [ ] 12.9 Add user profile and notification settings page
+- [x] 12.9 Add user profile and notification settings page
 - [ ] 12.10 Implement admin dashboard layout
-- [ ] 12.11 Add Indonesian language localization files
-- [ ] 12.12 Create error page designs (404, 500, maintenance)
+- [x] 12.11 Add Indonesian language localization files
+- [x] 12.12 Create error page designs (404, 500, maintenance)
 
 ## 13. API Integration & External Services
 
