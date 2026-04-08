@@ -3,31 +3,31 @@
 namespace App\Services;
 
 use App\Models\Chatlog;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use App\Services\ExternalApi\FireworksService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/**
+ * AI Assist Service
+ * Provides AI chat functionality using Fireworks AI
+ *
+ * Updated to use FireworksService from Task 13 for:
+ * - Circuit breaker protection (13.6)
+ * - Response caching (13.7)
+ * - Fallback handling (13.8)
+ * - API monitoring (13.9)
+ */
 class AIAssistService
 {
-    private Client $httpClient;
-    private string $apiKey;
-    private string $apiEndpoint;
-    private string $model;
+    private FireworksService $fireworks;
     private string $systemPrompt;
-    private int $timeout;
+    private int $maxContextMessages;
 
-    public function __construct()
+    public function __construct(?FireworksService $fireworks = null)
     {
-        $this->httpClient = new Client([
-            'timeout' => 30,
-            'connect_timeout' => 10,
-        ]);
-        $this->apiKey = config('services.fireworks.api_key');
-        $this->apiEndpoint = config('services.fireworks.endpoint', 'https://api.fireworks.ai/inference/v1/chat/completions');
-        $this->model = config('services.fireworks.model', 'accounts/fireworks/models/llama-v3p1-70b-instruct');
+        $this->fireworks = $fireworks ?? app(FireworksService::class);
         $this->systemPrompt = config('resq.ai_system_prompt', 'Anda adalah asisten AI ResQ yang membantu masyarakat Indonesia dengan informasi mitigasi bencana.');
-        $this->timeout = config('resq.ai_timeout', 3);
+        $this->maxContextMessages = 10; // Keep last 10 messages for context
     }
 
     /**
@@ -50,8 +50,9 @@ class AIAssistService
             // Build the messages array
             $messages = $this->buildMessages($message, $contextMessages);
 
-            // Call Fireworks AI API
-            $response = $this->callFireworksAPI($messages);
+            // Call Fireworks AI API through resilient service
+            $response = $this->fireworks->chat($messages);
+            $aiContent = $response['content'] ?? 'Maaf, saya tidak dapat memproses permintaan Anda saat ini.';
 
             $endTime = microtime(true);
             $responseTime = round($endTime - $startTime, 3);
@@ -70,39 +71,28 @@ class AIAssistService
                 'user_id' => $userId,
                 'conversation_id' => $conversationId,
                 'role' => 'assistant',
-                'message' => $response,
+                'message' => $aiContent,
                 'metadata' => [
                     'response_time' => $responseTime,
-                    'model' => $this->model,
+                    'model' => $response['model'] ?? 'unknown',
+                    'finish_reason' => $response['finish_reason'] ?? null,
+                    'usage' => $response['usage'] ?? [],
                     'timestamp' => now()->toIso8601String(),
                 ],
             ]);
 
             return [
-                'reply' => $response,
+                'reply' => $aiContent,
                 'conversation_id' => $conversationId,
                 'response_time' => $responseTime,
                 'success' => true,
             ];
 
-        } catch (RequestException $e) {
-            Log::error('Fireworks AI API error', [
-                'message' => $e->getMessage(),
-                'user_id' => $userId,
-                'conversation_id' => $conversationId,
-            ]);
-
-            return [
-                'reply' => 'Maaf, terjadi kesalahan saat memproses pesan Anda. Silakan coba lagi nanti.',
-                'conversation_id' => $conversationId,
-                'response_time' => null,
-                'success' => false,
-                'error' => $e->getMessage(),
-            ];
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('AI Assist Service error', [
                 'message' => $e->getMessage(),
                 'user_id' => $userId,
+                'conversation_id' => $conversationId,
             ]);
 
             return [
@@ -116,32 +106,25 @@ class AIAssistService
     }
 
     /**
-     * Call the Fireworks AI API.
+     * Quick chat without saving history
      *
-     * @param array $messages The formatted messages
-     * @return string The AI response
-     * @throws RequestException
+     * @param string $message User message
+     * @return string AI response
      */
-    private function callFireworksAPI(array $messages): string
+    public function chatQuick(string $message): string
     {
-        $response = $this->httpClient->post($this->apiEndpoint, [
-            'headers' => [
-                'Authorization' => "Bearer {$this->apiKey}",
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'model' => $this->model,
-                'messages' => $messages,
-                'max_tokens' => 1024,
-                'temperature' => 0.7,
-                'top_p' => 0.9,
-            ],
-            'timeout' => $this->timeout,
-        ]);
+        $messages = [
+            ['role' => 'system', 'content' => $this->systemPrompt],
+            ['role' => 'user', 'content' => $message],
+        ];
 
-        $data = json_decode($response->getBody()->getContents(), true);
-
-        return $data['choices'][0]['message']['content'] ?? 'Maaf, saya tidak dapat memproses permintaan Anda saat ini.';
+        try {
+            $response = $this->fireworks->chat($messages);
+            return $response['content'] ?? 'Maaf, saya tidak dapat menjawab saat ini.';
+        } catch (\Throwable $e) {
+            Log::warning('Quick chat failed', ['error' => $e->getMessage()]);
+            return 'Maaf, layanan AI tidak tersedia. Silakan coba lagi nanti.';
+        }
     }
 
     /**
@@ -153,15 +136,10 @@ class AIAssistService
      */
     private function buildMessages(string $userMessage, array $contextMessages): array
     {
-        $messages = [
-            [
-                'role' => 'system',
-                'content' => $this->systemPrompt,
-            ],
-        ];
+        $messages = [];
 
-        // Add context messages (last 5 messages to stay within token limits)
-        $recentMessages = array_slice($contextMessages, -5);
+        // Add context messages (limited to prevent token overflow)
+        $recentMessages = array_slice($contextMessages, -$this->maxContextMessages);
         foreach ($recentMessages as $msg) {
             $messages[] = [
                 'role' => $msg['role'],
@@ -212,6 +190,16 @@ class AIAssistService
      */
     public function isHealthy(): bool
     {
-        return !empty($this->apiKey) && !empty($this->apiEndpoint);
+        return $this->fireworks->validateConnection();
+    }
+
+    /**
+     * Get AI service status
+     *
+     * @return array
+     */
+    public function getStatus(): array
+    {
+        return $this->fireworks->getStatus();
     }
 }

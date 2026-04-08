@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AIAssistController;
+use App\Http\Controllers\ApiStatusController;
 use App\Http\Controllers\ChatHistoryController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/chat-history/{conversationId}', [ChatHistoryController::class, 'destroy'])->name('chat-history.destroy');
     Route::post('/chat-history/{conversationId}/restore', [ChatHistoryController::class, 'restore'])->name('chat-history.restore');
     Route::get('/chat-history/{conversationId}/export', [ChatHistoryController::class, 'export'])->name('chat-history.export');
+
+    // API Status Routes (Task 13) - Admin only
+    Route::prefix('admin/api-status')->middleware(['auth', 'admin'])->group(function () {
+        Route::get('/', [ApiStatusController::class, 'index']);
+        Route::get('/circuit', [ApiStatusController::class, 'circuitStatus']);
+        Route::post('/circuit/{service}/{action}', [ApiStatusController::class, 'controlCircuit']);
+    });
 });
+
+// Public health check endpoint
+Route::get('/api/health', [ApiStatusController::class, 'health']);
 
 require __DIR__.'/auth.php';
