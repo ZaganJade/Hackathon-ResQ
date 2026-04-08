@@ -46,3 +46,4 @@ Route::get('/api/disasters/{disaster}', [MapController::class, 'show'])->name('a
 Route::get('/api/geocode', [MapController::class, 'geocode'])->name('api.geocode');
 
 require __DIR__.'/auth.php';
+
