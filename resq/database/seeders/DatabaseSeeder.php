@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@resq.id',
             'password' => Hash::make('password'),
             'is_admin' => true,
+            'phone' => '+62812345678',
+            'preferences' => json_encode(['theme' => 'light', 'language' => 'id']),
         ]);
 
         // Create test user
@@ -30,16 +32,21 @@ class DatabaseSeeder extends Seeder
             'email' => 'user@resq.id',
             'password' => Hash::make('password'),
             'is_admin' => false,
+            'phone' => '+62812345679',
+            'preferences' => json_encode(['theme' => 'dark', 'language' => 'id']),
         ]);
 
-        // Create additional regular users
-        User::factory(5)->create();
+        // Create additional regular users (for notifications)
+        User::factory(8)->create();
 
         // Run specific seeders
         $this->call([
             DisasterSeeder::class,
             ArticleSeeder::class,
             GuideSeeder::class,
+            NotificationPreferenceSeeder::class,
+            ChatlogSeeder::class,
+            NotificationLogSeeder::class,
         ]);
     }
 }
