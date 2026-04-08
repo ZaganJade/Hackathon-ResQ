@@ -8,8 +8,8 @@
       "Bash(php artisan:*)",
       "Bash(openspec list:*)",
       "Bash(composer require:*)",
-      "Bash(npm run:*)",
-      "Bash(npm install:*)"
+      "Bash(chmod +x resq/scripts/queue-worker.sh)",
+      "Bash(php -m)"
     ]
   }
 }
