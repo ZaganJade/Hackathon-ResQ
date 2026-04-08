@@ -15,6 +15,7 @@ class NotificationPreference extends Model
         'whatsapp_number',
         'disaster_types',
         'is_active',
+        'min_alert_level',
     ];
 
     protected $casts = [
