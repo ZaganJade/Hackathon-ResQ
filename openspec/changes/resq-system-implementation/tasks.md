@@ -68,19 +68,19 @@
 
 ## 7. Disaster Map Implementation
 
-- [ ] 7.1 Create `MapController` with index and API endpoints
-- [ ] 7.2 Implement `GeoService` for coordinate calculations and geocoding
-- [ ] 7.3 Create `/api/disasters` endpoint returning GeoJSON format
-- [ ] 7.4 Add filtering by disaster type, severity, and date range
-- [ ] 7.5 Implement radius search for location-based queries
-- [ ] 7.6 Create Blade view with Google Maps JavaScript API integration
-- [ ] 7.7 Implement marker clustering for performance
-- [ ] 7.8 Add info windows with disaster details on marker click
-- [ ] 7.8 Implement auto-refresh mechanism (5-minute interval)
-- [ ] 7.9 Create disaster type filter UI with checkboxes
-- [ ] 7.10 Add location search box with geocoding
-- [ ] 7.11 Implement severity-based marker colors (red/yellow/green)
-- [ ] 7.12 Write integration tests for map API endpoints
+- [x] 7.1 Create `MapController` with index and API endpoints
+- [x] 7.2 Implement `GeoService` for coordinate calculations and geocoding
+- [x] 7.3 Create `/api/disasters` endpoint returning GeoJSON format
+- [x] 7.4 Add filtering by disaster type, severity, and date range
+- [x] 7.5 Implement radius search for location-based queries
+- [x] 7.6 Create Blade view with Google Maps JavaScript API integration
+- [x] 7.7 Implement marker clustering for performance
+- [x] 7.8 Add info windows with disaster details on marker click
+- [x] 7.9 Implement auto-refresh mechanism (5-minute interval)
+- [x] 7.10 Create disaster type filter UI with checkboxes
+- [x] 7.11 Add location search box with geocoding
+- [x] 7.12 Implement severity-based marker colors (red/yellow/green)
+- [x] 7.13 Write integration tests for map API endpoints
 
 ## 8. Disaster Management (Admin)
 
