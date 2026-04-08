@@ -104,4 +104,18 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook API Keys
+    |--------------------------------------------------------------------------
+    |
+    | API keys for 3rd party webhook access (BMKG, etc.)
+    |
+    */
+
+    'webhook' => [
+        'api_key' => env('WEBHOOK_API_KEY'), // Primary key for single client
+        'api_keys' => explode(',', env('WEBHOOK_API_KEYS', '')), // Multiple keys for multiple clients
+    ],
+
 ];

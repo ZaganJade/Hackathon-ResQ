@@ -505,7 +505,6 @@ class WhatsAppService extends BaseApiClient
 
         $message .= "\nSegera lakukan evakuasi ke tempat aman.";
         $message .= "\n\nInfo lengkap: " . url('/disasters');
-        $message .= "\n\n_Dikirim oleh ResQ Emergency System_";
 
         return $message;
     }
