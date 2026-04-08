@@ -97,19 +97,19 @@
 
 ## 9. WhatsApp Notification Service
 
-- [ ] 9.1 Create `NotificationService` class with WhatsApp Web API integration
-- [ ] 9.2 Implement HTTP client configuration for WhatsApp API
-- [ ] 9.3 Create queue job for sending notifications
-- [ ] 9.4 Add exponential backoff retry logic for failed sends
-- [ ] 9.5 Implement notification template system for different disaster types
-- [ ] 9.6 Create notification preference management UI
-- [ ] 9.7 Add phone number validation and format normalization
-- [ ] 9.8 Implement opt-in confirmation message sending
-- [ ] 9.9 Create disaster-triggered notification logic
-- [ ] 9.10 Add proximity-based notification filtering
-- [ ] 9.11 Implement rate limiting and bulk sending optimization
-- [ ] 9.12 Create notification logs view for admin monitoring
-- [ ] 9.13 Write tests for notification service with mocked API
+- [x] 9.1 Create `NotificationService` class with WhatsApp Web API integration
+- [x] 9.2 Implement HTTP client configuration for WhatsApp API
+- [x] 9.3 Create queue job for sending notifications
+- [x] 9.4 Add exponential backoff retry logic for failed sends
+- [x] 9.5 Implement notification template system for different disaster types
+- [x] 9.6 Create notification preference management UI
+- [x] 9.7 Add phone number validation and format normalization
+- [x] 9.8 Implement opt-in confirmation message sending
+- [x] 9.9 Create disaster-triggered notification logic
+- [x] 9.10 Add proximity-based notification filtering
+- [x] 9.11 Implement rate limiting and bulk sending optimization
+- [x] 9.12 Create notification logs view for admin monitoring
+- [x] 9.13 Write tests for notification service with mocked API
 
 ## 10. Mitigation Content Management
 
