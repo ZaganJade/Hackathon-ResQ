@@ -101,6 +101,7 @@ class ArticleSeeder extends Seeder
         foreach ($articles as $article) {
             Article::create(array_merge($article, [
                 'author_id' => $admin->id,
+                'slug' => \Illuminate\Support\Str::slug($article['title']),
             ]));
         }
     }

@@ -83,9 +83,9 @@
             
             <!-- Quick Prompts (Visible when no messages) -->
             <div class="flex gap-2 min-h-8 overflow-x-auto mt-3 pb-1 scrollbar-hide" x-show="messages.length === 0">
-                <button @click="quickAsk('Apa itu mitigasi bencana?')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Mitigasi Bencana?</button>
-                <button @click="quickAsk('Nomor darurat BNPB')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Nomor Darurat</button>
-                <button @click="quickAsk('Persiapan tas siaga bencana')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-primary-50 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Tas Siaga</button>
+                <button @click="quickAsk('Apa itu mitigasi bencana?')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-white/5 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Mitigasi Bencana?</button>
+                <button @click="quickAsk('Nomor darurat BNPB')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-white/5 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Nomor Darurat</button>
+                <button @click="quickAsk('Persiapan tas siaga bencana')" type="button" class="whitespace-nowrap text-xs bg-slate-50 text-slate-600 hover:bg-white/5 hover:text-primary-600 px-3 py-1.5 rounded-full transition border border-slate-200 hover:border-primary-200">Tas Siaga</button>
             </div>
         </div>
     </div>

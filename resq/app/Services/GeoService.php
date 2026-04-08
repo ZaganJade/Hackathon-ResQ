@@ -7,32 +7,108 @@ use Illuminate\Support\Facades\Log;
 
 class GeoService
 {
-    private string $apiKey;
-    private string $baseUrl = 'https://maps.googleapis.com/maps/api';
+    private ?string $googleApiKey;
+    private string $googleBaseUrl = 'https://maps.googleapis.com/maps/api';
 
     public function __construct()
     {
-        $this->apiKey = config('services.google.maps_api_key', '');
+        $this->googleApiKey = config('services.google.maps_api_key', null);
     }
 
     /**
-     * Geocode a location name to coordinates.
+     * Geocode a location name to coordinates using free Nominatim (OSM) first,
+     * fallback to Google if configured.
      *
      * @param string $location Location name (e.g., "Jakarta, Indonesia")
      * @return array|null ['lat' => float, 'lng' => float, 'formatted_address' => string] or null on failure
      */
     public function geocode(string $location): ?array
     {
-        if (empty($this->apiKey)) {
-            Log::warning('Google Maps API key not configured');
+        // Try Nominatim (OpenStreetMap) first - 100% free, no API key needed
+        $nominatimResult = $this->geocodeWithNominatim($location);
+        if ($nominatimResult) {
+            return $nominatimResult;
+        }
+
+        // Fallback to Google if API key is configured
+        if (!empty($this->googleApiKey)) {
+            return $this->geocodeWithGoogle($location);
+        }
+
+        Log::warning('Geocoding failed for location: ' . $location);
+        return null;
+    }
+
+    /**
+     * Geocode using Nominatim (OpenStreetMap) - Free, no API key required
+     *
+     * @param string $location
+     * @return array|null
+     */
+    private function geocodeWithNominatim(string $location): ?array
+    {
+        try {
+            // Add Indonesia bias if not already present
+            $searchQuery = $location;
+            if (!str_contains(strtolower($location), 'indonesia')) {
+                $searchQuery .= ', Indonesia';
+            }
+
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'ResQ/1.0 (ResQ Disaster Management App)',
+                    'Accept' => 'application/json',
+                ])
+                ->get('https://nominatim.openstreetmap.org/search', [
+                    'q' => $searchQuery,
+                    'format' => 'json',
+                    'limit' => 1,
+                    'accept-language' => 'id',
+                ]);
+
+            if ($response->successful()) {
+                $results = $response->json();
+
+                if (!empty($results) && is_array($results)) {
+                    $result = $results[0];
+
+                    return [
+                        'lat' => (float) $result['lat'],
+                        'lng' => (float) $result['lon'],
+                        'formatted_address' => $result['display_name'],
+                        'source' => 'nominatim',
+                    ];
+                }
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::warning('Nominatim geocoding failed', [
+                'location' => $location,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Geocode using Google Maps API (requires API key)
+     *
+     * @param string $location
+     * @return array|null
+     */
+    private function geocodeWithGoogle(string $location): ?array
+    {
+        if (empty($this->googleApiKey)) {
             return null;
         }
 
         try {
             $response = Http::timeout(10)
-                ->get("{$this->baseUrl}/geocode/json", [
+                ->get("{$this->googleBaseUrl}/geocode/json", [
                     'address' => $location,
-                    'key' => $this->apiKey,
+                    'key' => $this->googleApiKey,
                     'region' => 'id', // Indonesia region bias
                 ]);
 
@@ -43,17 +119,18 @@ class GeoService
                     'lat' => $result['geometry']['location']['lat'],
                     'lng' => $result['geometry']['location']['lng'],
                     'formatted_address' => $result['formatted_address'],
+                    'source' => 'google',
                 ];
             }
 
-            Log::warning('Geocoding failed', [
+            Log::warning('Google geocoding failed', [
                 'location' => $location,
                 'status' => $response->json('status'),
             ]);
 
             return null;
         } catch (\Exception $e) {
-            Log::error('Geocoding error', [
+            Log::error('Google geocoding error', [
                 'location' => $location,
                 'error' => $e->getMessage(),
             ]);
@@ -63,7 +140,7 @@ class GeoService
     }
 
     /**
-     * Reverse geocode coordinates to address.
+     * Reverse geocode coordinates to address using Nominatim (free) or Google (fallback).
      *
      * @param float $lat Latitude
      * @param float $lng Longitude
@@ -71,16 +148,80 @@ class GeoService
      */
     public function reverseGeocode(float $lat, float $lng): ?string
     {
-        if (empty($this->apiKey)) {
-            Log::warning('Google Maps API key not configured');
+        // Try Nominatim first (free)
+        $nominatimResult = $this->reverseGeocodeWithNominatim($lat, $lng);
+        if ($nominatimResult) {
+            return $nominatimResult;
+        }
+
+        // Fallback to Google if configured
+        if (!empty($this->googleApiKey)) {
+            return $this->reverseGeocodeWithGoogle($lat, $lng);
+        }
+
+        return null;
+    }
+
+    /**
+     * Reverse geocode using Nominatim (OpenStreetMap) - Free
+     *
+     * @param float $lat
+     * @param float $lng
+     * @return string|null
+     */
+    private function reverseGeocodeWithNominatim(float $lat, float $lng): ?string
+    {
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'ResQ/1.0 (ResQ Disaster Management App)',
+                    'Accept' => 'application/json',
+                ])
+                ->get('https://nominatim.openstreetmap.org/reverse', [
+                    'lat' => $lat,
+                    'lon' => $lng,
+                    'format' => 'json',
+                    'accept-language' => 'id',
+                ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+
+                if (isset($result['display_name'])) {
+                    return $result['display_name'];
+                }
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::warning('Nominatim reverse geocoding failed', [
+                'lat' => $lat,
+                'lng' => $lng,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Reverse geocode using Google Maps API
+     *
+     * @param float $lat
+     * @param float $lng
+     * @return string|null
+     */
+    private function reverseGeocodeWithGoogle(float $lat, float $lng): ?string
+    {
+        if (empty($this->googleApiKey)) {
             return null;
         }
 
         try {
             $response = Http::timeout(10)
-                ->get("{$this->baseUrl}/geocode/json", [
+                ->get("{$this->googleBaseUrl}/geocode/json", [
                     'latlng' => "{$lat},{$lng}",
-                    'key' => $this->apiKey,
+                    'key' => $this->googleApiKey,
                 ]);
 
             if ($response->successful() && $response->json('status') === 'OK') {
@@ -89,7 +230,7 @@ class GeoService
 
             return null;
         } catch (\Exception $e) {
-            Log::error('Reverse geocoding error', [
+            Log::error('Google reverse geocoding error', [
                 'lat' => $lat,
                 'lng' => $lng,
                 'error' => $e->getMessage(),
@@ -153,12 +294,13 @@ class GeoService
     /**
      * Get map configuration for frontend.
      *
-     * @return array Configuration array with API key, center, zoom
+     * @return array Configuration array
      */
     public function getMapConfig(): array
     {
         return [
-            'api_key' => $this->apiKey,
+            'provider' => 'leaflet', // Now uses Leaflet + OpenStreetMap
+            'osm_tiles' => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             'center' => [
                 'lat' => -2.5489, // Center of Indonesia
                 'lng' => 118.0149,
@@ -166,6 +308,7 @@ class GeoService
             'zoom' => 5,
             'max_zoom' => 18,
             'min_zoom' => 4,
+            'attribution' => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         ];
     }
 
@@ -178,28 +321,25 @@ class GeoService
     public function getSeverityColor(string $severity): string
     {
         return match (strtolower($severity)) {
-            'critical' => '#DC2626', // Red-600
-            'high' => '#DC2626',     // Red-600
-            'medium' => '#F59E0B',   // Amber-500
-            'low' => '#10B981',      // Emerald-500
+            'critical' => '#f43f5e', // Rose-500 (updated for Tailwind v4)
+            'high' => '#f43f5e',     // Rose-500
+            'medium' => '#f59e0b',   // Amber-500
+            'low' => '#059669',      // Emerald-600
             default => '#6B7280',    // Gray-500
         };
     }
 
     /**
      * Get severity-based marker icon URL.
+     * Note: For Leaflet, we use CSS-styled markers instead of image icons.
+     * This method kept for backwards compatibility.
      *
      * @param string $severity Severity level
-     * @return string URL to marker icon
+     * @return string CSS color value
      */
     public function getSeverityMarkerIcon(string $severity): string
     {
-        $color = $this->getSeverityColor($severity);
-
-        // Use Google Charts API to generate marker icons
-        // Replace # with 0x for the API
-        $chartColor = str_replace('#', '0x', substr($color, 1));
-
-        return "https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=|{$chartColor}|000000";
+        // For Leaflet circle markers, we return the color directly
+        return $this->getSeverityColor($severity);
     }
 }

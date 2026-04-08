@@ -31,10 +31,12 @@ return [
 
     'whatsapp' => [
         'enabled' => env('WHATSAPP_ENABLED', true),
+        'provider' => env('WHATSAPP_PROVIDER', 'yobase'),
         'retry_attempts' => 3,
         'retry_delay' => 5,
         'notification_radius' => 50, // km
         'max_daily_notifications' => 1000,
+        // API credentials are in config/services.php
     ],
 
     /*

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->enum('category', ['earthquake', 'flood', 'volcano', 'tsunami', 'landslide', 'fire', 'drought', 'general']);
+            $table->enum('category', ['earthquake', 'flood', 'volcano', 'tsunami', 'landslide', 'fire', 'drought', 'general', 'storm', 'heatwave', 'wilderness', 'first-aid']);
             $table->longText('content');
             $table->json('steps')->nullable();
             $table->string('image')->nullable();

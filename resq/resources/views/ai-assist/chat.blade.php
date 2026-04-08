@@ -1,148 +1,177 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-soft">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="heading-4 text-primary-800">
-                        {{ __('AI Assist ResQ') }}
-                    </h2>
-                    <p class="body-small">Asisten cerdas untuk informasi mitigasi bencana</p>
-                </div>
-            </div>
-            <button id="newChatBtn" class="btn-secondary">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                {{ __('Chat Baru') }}
-            </button>
-        </div>
-    </x-slot>
+    {{-- AI Assist — Fluid Modern Dashboard Style --}}
 
-    <div class="py-6 container-padding">
-        <div class="max-w-4xl mx-auto">
-            <!-- Status Bar -->
-            <div id="statusBar" class="mb-4 hidden">
-                <div class="card p-4 border-l-4 border-primary-500 bg-primary-50">
-                    <div class="flex items-center">
-                        <div class="typing-indicator mr-3">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+    <div class="min-h-screen bg-gradient-to-b from-green-50/60 via-white to-slate-50 pb-24 lg:pb-0" x-data="{}" x-cloak>
+
+        {{-- DESKTOP SIDEBAR --}}
+        <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col"
+               x-data="{ sidebarHover: false }" @mouseenter="sidebarHover = true" @mouseleave="sidebarHover = false">
+            <div class="h-full bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 shadow-soft-lg flex flex-col py-6 sidebar-spring overflow-hidden" :class="sidebarHover ? 'w-64' : 'w-[72px]'">
+                <div class="flex items-center gap-3 px-4 mb-8 overflow-hidden">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-emerald-400 flex items-center justify-center shrink-0 shadow-md">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="font-bold text-xl text-white whitespace-nowrap transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">ResQ</span>
+                </div>
+                <nav class="flex-1 flex flex-col gap-1 px-3">
+                    @php $menuItems = [
+                        ['route'=>'dashboard','label'=>'Beranda','icon'=>'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6','active'=>'dashboard'],
+                        ['route'=>'map.index','label'=>'Peta Interaktif','icon'=>'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7','active'=>'map.*'],
+                        ['route'=>'guides.index','label'=>'Edukasi & Pelatihan','icon'=>'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253','active'=>'guides.*'],
+                        ['route'=>'articles.index','label'=>'Berita & Info','icon'=>'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z','active'=>'articles.*'],
+                        ['route'=>'chat-history.index','label'=>'Riwayat Chat','icon'=>'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z','active'=>'chat-history.*'],
+                        ['route'=>'ai-assist.index','label'=>'AI Assistant','icon'=>'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z','active'=>'ai-assist.*'],
+                        ['route'=>'profile.edit','label'=>'Profil','icon'=>'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z','active'=>'profile.*'],
+                    ]; @endphp
+                    @foreach($menuItems as $item)
+                        <a href="{{ route($item['route']) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group whitespace-nowrap {{ request()->routeIs($item['active']) ? 'menu-active' : 'text-slate-400 hover:bg-white/5 hover:text-emerald-400' }}">
+                            <div class="w-7 h-7 flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"></path></svg></div>
+                            <span class="text-sm font-medium transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </nav>
+                <div class="px-3 mt-auto">
+                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 overflow-hidden">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-emerald-500 flex items-center justify-center shrink-0 ring-2 ring-white"><span class="text-white font-bold text-xs">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span></div>
+                        <div class="min-w-0 transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
+                            <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
-                        <span id="statusText" class="text-sm text-primary-700 font-medium">AI sedang mengetik...</span>
                     </div>
                 </div>
             </div>
+        </aside>
 
-            <!-- Error Alert -->
-            <div id="errorAlert" class="mb-4 hidden">
-                <div class="card p-4 border-l-4 border-danger bg-rose-50">
-                    <div class="flex items-center">
-                        <svg class="h-5 w-5 text-danger mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span id="errorText" class="text-sm text-rose-700 flex-1">Terjadi kesalahan. Silakan coba lagi.</span>
-                        <button id="dismissError" class="text-rose-500 hover:text-rose-700 p-1 rounded-lg hover:bg-rose-100 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+        {{-- MAIN CONTENT --}}
+        <div class="lg:ml-[72px] flex flex-col h-screen lg:h-screen">
+
+            {{-- Top Bar --}}
+            <div class="flex-shrink-0 bg-white/80 backdrop-blur-xl border-b border-slate-100/80 shadow-sm animate-fade-up">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-primary-500 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-base sm:text-lg font-bold text-slate-800">AI Assist ResQ</h1>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span class="text-xs text-slate-400">Online — siap membantu</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="newChatBtn" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-card text-sm font-semibold text-slate-600 hover:text-primary-700 hover:shadow-card-hover transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <span class="hidden sm:inline">Chat Baru</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Chat Container -->
-            <div class="card overflow-hidden border-0 shadow-soft-xl">
-                <!-- Messages Area -->
-                <div id="chatMessages" class="h-[500px] overflow-y-auto p-6 space-y-6 bg-slate-50/50">
-                    <!-- Welcome Message -->
-                    <div class="flex items-start space-x-4 animate-fade-in">
-                        <div class="flex-shrink-0">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-soft">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
+            {{-- Status Bar --}}
+            <div id="statusBar" class="hidden flex-shrink-0">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div class="bg-gradient-to-r from-primary-50 to-emerald-50 rounded-2xl p-3 border border-primary-100/40 shadow-sm">
+                        <div class="flex items-center">
+                            <div class="typing-indicator mr-3">
+                                <span></span><span></span><span></span>
                             </div>
-                        </div>
-                        <div class="flex-1 bg-white rounded-2xl rounded-tl-none p-5 shadow-sm border border-slate-100">
-                            <p class="text-slate-800 font-medium">Selamat datang di <span class="text-primary-600">AI Assist ResQ</span>! 👋</p>
-                            <p class="text-slate-600 mt-2">Saya siap membantu Anda dengan informasi tentang:</p>
-                            <ul class="mt-3 space-y-2 text-slate-600">
-                                <li class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-primary-500 mr-3"></span>
-                                    Kesiapsiagaan bencana
-                                </li>
-                                <li class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-secondary-500 mr-3"></span>
-                                    Respons darurat
-                                </li>
-                                <li class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-accent-500 mr-3"></span>
-                                    Pemulihan pasca-bencana
-                                </li>
-                                <li class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500 mr-3"></span>
-                                    Mitigasi risiko
-                                </li>
-                            </ul>
-                            <p class="text-slate-600 mt-4">Apa yang ingin Anda tanyakan hari ini?</p>
+                            <span id="statusText" class="text-sm text-primary-700 font-medium">AI sedang mengetik...</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Input Area -->
-                <div class="border-t border-slate-100 bg-white p-4">
-                    <form id="chatForm" class="flex items-end space-x-3">
+            {{-- Error Alert --}}
+            <div id="errorAlert" class="hidden flex-shrink-0">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                    <div class="bg-rose-50 rounded-2xl p-3 border border-rose-100/60 shadow-sm">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 text-rose-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span id="errorText" class="text-sm text-rose-700 flex-1">Terjadi kesalahan. Silakan coba lagi.</span>
+                            <button id="dismissError" class="text-rose-400 hover:text-rose-600 p-1 rounded-lg hover:bg-rose-100 transition-colors ml-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Chat Messages --}}
+            <div id="chatMessages" class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5 max-w-4xl mx-auto w-full">
+                {{-- Welcome Message --}}
+                <div class="flex items-start gap-3 animate-fade-up">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-primary-500 flex items-center justify-center shadow-md">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="flex-1 bg-white rounded-2xl rounded-tl-md p-5 shadow-card border border-slate-100/60">
+                        <p class="text-slate-800 font-semibold">Selamat datang di <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-primary-600">AI Assist ResQ</span>! 👋</p>
+                        <p class="text-slate-500 mt-2 text-sm">Saya siap membantu Anda dengan informasi tentang:</p>
+                        <div class="mt-3 grid grid-cols-2 gap-2">
+                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-primary-50/60 border border-primary-100/40">
+                                <div class="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center"><span class="text-xs">🛡️</span></div>
+                                <span class="text-xs font-medium text-slate-600">Kesiapsiagaan bencana</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-rose-50/60 border border-rose-100/40">
+                                <div class="w-7 h-7 rounded-lg bg-rose-100 flex items-center justify-center"><span class="text-xs">🚨</span></div>
+                                <span class="text-xs font-medium text-slate-600">Respons darurat</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-amber-50/60 border border-amber-100/40">
+                                <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center"><span class="text-xs">🏗️</span></div>
+                                <span class="text-xs font-medium text-slate-600">Pemulihan pasca-bencana</span>
+                            </div>
+                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-sky-50/60 border border-sky-100/40">
+                                <div class="w-7 h-7 rounded-lg bg-sky-100 flex items-center justify-center"><span class="text-xs">📋</span></div>
+                                <span class="text-xs font-medium text-slate-600">Mitigasi risiko</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-500 mt-4 text-sm">Apa yang ingin Anda tanyakan hari ini?</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Input Area — Fixed Bottom --}}
+            <div class="flex-shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-100/80">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+                    <form id="chatForm" class="flex items-end gap-3">
                         <div class="flex-1 relative">
                             <textarea
                                 id="messageInput"
                                 rows="1"
-                                class="w-full resize-none rounded-2xl border-slate-200 bg-slate-50 focus:bg-white focus:border-primary-500 focus:ring-primary-500 px-4 py-3 pr-12 transition-all duration-200"
+                                class="w-full resize-none rounded-2xl border-0 bg-slate-50/80 focus:bg-white ring-1 ring-slate-200 focus:ring-2 focus:ring-primary-500 px-5 py-3.5 pr-14 text-sm text-slate-700 placeholder-slate-400 transition-all duration-200 shadow-sm"
                                 placeholder="Ketik pesan Anda di sini..."
                                 maxlength="2000"
                             ></textarea>
-                            <div class="absolute right-3 bottom-3 text-xs text-slate-400">
-                                <span id="charCount">0</span>/2000
+                            <div class="absolute right-4 bottom-3.5 text-[10px] text-slate-300 font-mono">
+                                <span id="charCount">0</span>/2K
                             </div>
                         </div>
-                        <button
-                            type="submit"
-                            id="sendButton"
-                            class="btn-primary px-5 py-3"
-                        >
+                        <button type="submit" id="sendButton"
+                                class="px-5 py-3.5 bg-gradient-to-r from-violet-500 to-primary-500 text-white rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold text-sm shadow-md">
                             <span id="sendText" class="hidden sm:inline">Kirim</span>
-                            <svg id="sendIcon" class="w-5 h-5 sm:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
+                            <svg id="sendIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                             <svg id="loadingIcon" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                         </button>
                     </form>
-                    <div class="mt-2 text-center">
-                        <span class="text-xs text-slate-400">Tekan Enter untuk mengirim, Shift+Enter untuk baris baru</span>
+                    <div class="flex items-center justify-between mt-2 px-1">
+                        <span class="text-[10px] text-slate-300">Enter kirim · Shift+Enter baris baru</span>
+                        <div id="conversationInfo" class="flex items-center gap-1.5 text-[10px] text-slate-300">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="hidden sm:inline">ID:</span>
+                            <span id="conversationId" class="font-mono">-</span>
+                            <span id="responseTime" class="hidden ml-2">
+                                · <span id="responseTimeValue" class="text-primary-500 font-medium">-</span>s
+                            </span>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Conversation Info -->
-            <div class="mt-4 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
-                <div id="conversationInfo" class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                    ID Percakapan:
-                    <span id="conversationId" class="font-mono bg-slate-100 px-2 py-0.5 rounded">-</span>
-                </div>
-                <div id="responseTime" class="hidden flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Waktu respons: <span id="responseTimeValue" class="font-medium text-primary-600">-</span> detik
                 </div>
             </div>
         </div>
@@ -172,17 +201,14 @@
             let conversationId = null;
             let isProcessing = false;
 
-            // Generate new conversation ID on load
             generateNewConversation();
 
-            // Auto-resize textarea
             messageInput.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 150) + 'px';
                 charCount.textContent = this.value.length;
             });
 
-            // Handle Enter key
             messageInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -190,34 +216,25 @@
                 }
             });
 
-            // Dismiss error
             dismissError.addEventListener('click', () => {
                 errorAlert.classList.add('hidden');
             });
 
-            // New chat button
             newChatBtn.addEventListener('click', () => {
                 generateNewConversation();
                 clearMessages();
                 errorAlert.classList.add('hidden');
             });
 
-            // Form submission
             chatForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-
                 const message = messageInput.value.trim();
                 if (!message || isProcessing) return;
 
-                // Add user message to chat
                 addMessage('user', message);
-
-                // Clear input
                 messageInput.value = '';
                 messageInput.style.height = 'auto';
                 charCount.textContent = '0';
-
-                // Show loading state
                 setLoading(true);
                 errorAlert.classList.add('hidden');
 
@@ -228,10 +245,7 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify({
-                            message: message,
-                            conversation_id: conversationId
-                        })
+                        body: JSON.stringify({ message, conversation_id: conversationId })
                     });
 
                     const data = await response.json();
@@ -239,8 +253,7 @@
                     if (data.success) {
                         addMessage('assistant', data.reply);
                         conversationId = data.conversation_id;
-                        conversationIdEl.textContent = conversationId.substring(0, 15) + '...';
-
+                        conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                         if (data.response_time) {
                             responseTimeEl.classList.remove('hidden');
                             responseTimeValue.textContent = data.response_time;
@@ -257,28 +270,26 @@
 
             function addMessage(role, content) {
                 const messageDiv = document.createElement('div');
-                messageDiv.className = 'flex items-start space-x-4 animate-fade-up';
+                messageDiv.className = 'flex items-start gap-3 animate-fade-up';
 
                 const isUser = role === 'user';
-                const avatarBg = isUser
-                    ? 'bg-slate-600'
-                    : 'bg-gradient-to-br from-primary-500 to-secondary-500';
+                const avatarClass = isUser
+                    ? 'bg-gradient-to-br from-slate-600 to-slate-700'
+                    : 'bg-gradient-to-br from-violet-500 to-primary-500';
                 const avatarIcon = isUser
                     ? '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>'
                     : '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>';
                 const bubbleClass = isUser
-                    ? 'bg-primary-50 border-primary-200 rounded-2xl rounded-tr-none'
-                    : 'bg-white border-slate-100 rounded-2xl rounded-tl-none';
+                    ? 'bg-gradient-to-br from-primary-50 to-emerald-50 border-primary-100/40 rounded-2xl rounded-tr-md'
+                    : 'bg-white border-slate-100/60 rounded-2xl rounded-tl-md';
 
                 messageDiv.innerHTML = `
                     <div class="flex-shrink-0">
-                        <div class="w-10 h-10 rounded-full ${avatarBg} flex items-center justify-center shadow-sm">
-                            ${avatarIcon}
-                        </div>
+                        <div class="w-10 h-10 rounded-2xl ${avatarClass} flex items-center justify-center shadow-md">${avatarIcon}</div>
                     </div>
-                    <div class="flex-1 ${bubbleClass} p-4 shadow-sm border">
-                        <div class="prose prose-sm max-w-none text-slate-800 leading-relaxed">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
-                        <div class="mt-2 text-xs text-slate-400">${formatTime(new Date())}</div>
+                    <div class="flex-1 ${bubbleClass} p-4 shadow-card border">
+                        <div class="prose prose-sm max-w-none text-slate-700 leading-relaxed">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
+                        <div class="mt-2 text-[10px] text-slate-300 font-medium">${formatTime(new Date())}</div>
                     </div>
                 `;
 
@@ -289,7 +300,6 @@
             function setLoading(loading) {
                 isProcessing = loading;
                 sendButton.disabled = loading;
-
                 if (loading) {
                     sendText.textContent = 'Mengirim...';
                     sendIcon.classList.add('hidden');
@@ -311,30 +321,40 @@
 
             function generateNewConversation() {
                 conversationId = 'conv_' + Math.random().toString(36).substring(2, 18);
-                conversationIdEl.textContent = conversationId.substring(0, 15) + '...';
+                conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                 responseTimeEl.classList.add('hidden');
             }
 
             function clearMessages() {
                 chatMessages.innerHTML = `
-                    <div class="flex items-start space-x-4 animate-fade-in">
+                    <div class="flex items-start gap-3 animate-fade-up">
                         <div class="flex-shrink-0">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-soft">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-primary-500 flex items-center justify-center shadow-md">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             </div>
                         </div>
-                        <div class="flex-1 bg-white rounded-2xl rounded-tl-none p-5 shadow-sm border border-slate-100">
-                            <p class="text-slate-800 font-medium">Selamat datang di <span class="text-primary-600">AI Assist ResQ</span>! 👋</p>
-                            <p class="text-slate-600 mt-2">Saya siap membantu Anda dengan informasi tentang:</p>
-                            <ul class="mt-3 space-y-2 text-slate-600">
-                                <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-primary-500 mr-3"></span>Kesiapsiagaan bencana</li>
-                                <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-secondary-500 mr-3"></span>Respons darurat</li>
-                                <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-500 mr-3"></span>Pemulihan pasca-bencana</li>
-                                <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-sky-500 mr-3"></span>Mitigasi risiko</li>
-                            </ul>
-                            <p class="text-slate-600 mt-4">Apa yang ingin Anda tanyakan hari ini?</p>
+                        <div class="flex-1 bg-white rounded-2xl rounded-tl-md p-5 shadow-card border border-slate-100/60">
+                            <p class="text-slate-800 font-semibold">Selamat datang di <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-primary-600">AI Assist ResQ</span>! 👋</p>
+                            <p class="text-slate-500 mt-2 text-sm">Saya siap membantu Anda dengan informasi tentang:</p>
+                            <div class="mt-3 grid grid-cols-2 gap-2">
+                                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-primary-50/60 border border-primary-100/40">
+                                    <div class="w-7 h-7 rounded-lg bg-primary-100 flex items-center justify-center"><span class="text-xs">🛡️</span></div>
+                                    <span class="text-xs font-medium text-slate-600">Kesiapsiagaan bencana</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-rose-50/60 border border-rose-100/40">
+                                    <div class="w-7 h-7 rounded-lg bg-rose-100 flex items-center justify-center"><span class="text-xs">🚨</span></div>
+                                    <span class="text-xs font-medium text-slate-600">Respons darurat</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-amber-50/60 border border-amber-100/40">
+                                    <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center"><span class="text-xs">🏗️</span></div>
+                                    <span class="text-xs font-medium text-slate-600">Pemulihan pasca-bencana</span>
+                                </div>
+                                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-sky-50/60 border border-sky-100/40">
+                                    <div class="w-7 h-7 rounded-lg bg-sky-100 flex items-center justify-center"><span class="text-xs">📋</span></div>
+                                    <span class="text-xs font-medium text-slate-600">Mitigasi risiko</span>
+                                </div>
+                            </div>
+                            <p class="text-slate-500 mt-4 text-sm">Apa yang ingin Anda tanyakan hari ini?</p>
                         </div>
                     </div>
                 `;
@@ -357,42 +377,24 @@
     </script>
     @endpush
 
-    @push('styles')
     <style>
-        /* Typing indicator animation */
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        [x-cloak] { display: none !important; }
+        .typing-indicator { display: flex; align-items: center; gap: 4px; }
         .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background-color: var(--color-primary-500);
+            width: 7px; height: 7px;
+            background: linear-gradient(135deg, #8b5cf6, #10b981);
             border-radius: 50%;
             animation: typing 1.4s infinite ease-in-out both;
         }
         .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
         .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
             40% { transform: scale(1); opacity: 1; }
         }
-
-        /* Custom scrollbar */
-        #chatMessages::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chatMessages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #chatMessages::-webkit-scrollbar-thumb {
-            background-color: var(--color-slate-300);
-            border-radius: 20px;
-        }
-        #chatMessages::-webkit-scrollbar-thumb:hover {
-            background-color: var(--color-slate-400);
-        }
+        #chatMessages::-webkit-scrollbar { width: 5px; }
+        #chatMessages::-webkit-scrollbar-track { background: transparent; }
+        #chatMessages::-webkit-scrollbar-thumb { background-color: #e2e8f0; border-radius: 20px; }
+        #chatMessages::-webkit-scrollbar-thumb:hover { background-color: #cbd5e1; }
     </style>
-    @endpush
 </x-app-layout>

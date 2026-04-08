@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Queue;
  * WhatsApp Notification Service
  * Task 13.5 Implementation
  *
+ * Providers supported: Yobase, Wablas, Twilio
+ *
  * Provides:
  * - WhatsApp message sending
  * - Bulk message sending with batching
@@ -27,6 +29,7 @@ class WhatsAppService extends BaseApiClient
 {
     protected int $bulkBatchSize;
     protected ?string $senderNumber = null;
+    protected string $provider = 'yobase'; // yobase, wablas, twilio
 
     protected CircuitBreaker $circuitBreaker;
     protected ApiMonitor $monitor;
@@ -47,19 +50,33 @@ class WhatsAppService extends BaseApiClient
     {
         $config = config('services.whatsapp');
 
-        $this->baseUrl = rtrim($config['api_url'] ?? 'https://api.wablas.com/api', '/');
+        $this->provider = $config['provider'] ?? 'yobase';
+        $this->baseUrl = rtrim($config['api_url'] ?? 'https://whats.yobase.me/api', '/');
         $this->apiKey = $config['api_token'] ?? null;
-        $this->timeout = $config['timeout'] ?? 10;
-        $this->maxRetries = $config['max_retries'] ?? 5;
+        $this->timeout = $config['timeout'] ?? 30;
+        $this->maxRetries = $config['max_retries'] ?? 3;
         $this->retryDelay = $config['retry_delay'] ?? 2000;
         $this->retryMultiplier = 2.0;
         $this->bulkBatchSize = $config['bulk_batch_size'] ?? 100;
-        $this->senderNumber = $config['sender_number'] ?? null;
+        $this->senderNumber = $config['sender_number'] ?? null; // For Yobase this is session_id
 
         $this->headers = [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
+
+        // Yobase uses X-Api-Key header instead of Authorization Bearer
+        if ($this->provider === 'yobase') {
+            $this->headers['X-Api-Key'] = $this->apiKey;
+        }
+    }
+
+    /**
+     * Get API provider name
+     */
+    public function getProvider(): string
+    {
+        return $this->provider;
     }
 
     protected function getServiceName(): string
@@ -72,7 +89,13 @@ class WhatsAppService extends BaseApiClient
      */
     protected function authenticate(PendingRequest $client): PendingRequest
     {
-        return $client->withToken($this->apiKey);
+        // Yobase uses X-Api-Key header which is already set in headers
+        // Other providers use Bearer token
+        if ($this->provider !== 'yobase') {
+            return $client->withToken($this->apiKey);
+        }
+
+        return $client->withHeaders($this->headers);
     }
 
     /**
@@ -93,44 +116,39 @@ class WhatsAppService extends BaseApiClient
             $phone = $this->normalizePhoneNumber($phoneNumber);
 
             try {
-                $endpoint = '/send-message';
+                // Provider-specific endpoint and payload
+                $payload = $this->buildPayload($phone, $message, $options);
+                $endpoint = $this->getSendEndpoint();
+                $url = $this->buildUrl($endpoint);
 
-                $payload = [
-                    'phone' => $phone,
-                    'message' => $message,
-                ];
-
-                // Add sender if configured
-                if ($this->senderNumber) {
-                    $payload['sender'] = $this->senderNumber;
+                // Make request based on provider
+                if ($this->provider === 'yobase') {
+                    // Yobase uses X-Api-Key header
+                    $response = Http::timeout($this->timeout)
+                        ->withHeaders([
+                            'X-Api-Key' => $this->apiKey,
+                            'Content-Type' => 'application/json',
+                            'Accept' => 'application/json',
+                        ])
+                        ->post($url, $payload);
+                } else {
+                    // Other providers use Bearer token
+                    $response = Http::timeout($this->timeout)
+                        ->withToken($this->apiKey)
+                        ->asJson()
+                        ->post($url, $payload);
                 }
-
-                // Add additional options
-                if (isset($options['media_url'])) {
-                    $payload['media_url'] = $options['media_url'];
-                }
-
-                if (isset($options['buttons'])) {
-                    $payload['buttons'] = $options['buttons'];
-                }
-
-                // Make request
-                $client = Http::timeout($this->timeout)
-                    ->withToken($this->apiKey)
-                    ->asJson();
-
-                $response = $client->post($this->buildUrl($endpoint), $payload);
 
                 $responseTime = round((microtime(true) - $startTime) * 1000, 2);
                 $data = $response->json();
 
                 // Check for API-level errors
-                if (isset($data['status']) && $data['status'] === 'error') {
+                if ($this->isApiError($data, $response->status())) {
                     throw new ApiException(
-                        message: $data['message'] ?? 'Unknown WhatsApp API error',
+                        message: $this->extractErrorMessage($data),
                         statusCode: $response->status(),
                         service: $this->getServiceName(),
-                        context: ['phone' => $phone, 'response' => $data]
+                        context: ['phone' => $phone, 'response' => $data, 'provider' => $this->provider]
                     );
                 }
 
@@ -146,11 +164,12 @@ class WhatsAppService extends BaseApiClient
                 $this->fallback->recordSuccess($this->getServiceName());
 
                 return [
-                    'status' => $data['status'] ?? 'sent',
-                    'message_id' => $data['message_id'] ?? $data['id'] ?? null,
+                    'status' => 'sent',
+                    'message_id' => $this->extractMessageId($data),
                     'phone' => $phone,
                     'sent_at' => now()->toIso8601String(),
                     'response_time_ms' => $responseTime,
+                    'provider' => $this->provider,
                 ];
 
             } catch (\Throwable $e) {
@@ -175,10 +194,86 @@ class WhatsAppService extends BaseApiClient
                     message: "WhatsApp send failed: {$e->getMessage()}",
                     previous: $e,
                     service: $this->getServiceName(),
-                    context: ['phone' => $phone]
+                    context: ['phone' => $phone, 'provider' => $this->provider]
                 );
             }
         });
+    }
+
+    /**
+     * Build payload based on provider
+     */
+    protected function buildPayload(string $phone, string $message, array $options): array
+    {
+        return match ($this->provider) {
+            'yobase' => [
+                'session_id' => $this->senderNumber, // session_id is the sender number in Yobase
+                'to' => $phone,
+                'message' => $message,
+            ],
+            'wablas' => [
+                'phone' => $phone,
+                'message' => $message,
+                'sender' => $this->senderNumber,
+                'media_url' => $options['media_url'] ?? null,
+            ],
+            default => [
+                'to' => $phone,
+                'message' => $message,
+            ],
+        };
+    }
+
+    /**
+     * Get send endpoint based on provider
+     */
+    protected function getSendEndpoint(): string
+    {
+        return match ($this->provider) {
+            'yobase' => '/send',  // Yobase API uses /send endpoint
+            'wablas' => '/send-message',
+            default => '/send',
+        };
+    }
+
+    /**
+     * Check if API response indicates error
+     */
+    protected function isApiError(?array $data, int $statusCode): bool
+    {
+        if ($statusCode >= 400) {
+            return true;
+        }
+
+        return match ($this->provider) {
+            'yobase' => isset($data['success']) && $data['success'] === false,
+            'wablas' => isset($data['status']) && $data['status'] === 'error',
+            default => false,
+        };
+    }
+
+    /**
+     * Extract error message from API response
+     */
+    protected function extractErrorMessage(?array $data): string
+    {
+        return match ($this->provider) {
+            'yobase' => $data['error'] ?? $data['message'] ?? 'Unknown Yobase API error',
+            'wablas' => $data['message'] ?? 'Unknown Wablas API error',
+            default => $data['message'] ?? 'Unknown API error',
+        };
+    }
+
+    /**
+     * Extract message ID from API response
+     */
+    protected function extractMessageId(?array $data): ?string
+    {
+        return match ($this->provider) {
+            'yobase' => $data['data']['id'] ?? null,  // Yobase returns id in data.id
+            'wablas' => $data['message_id'] ?? $data['id'] ?? null,
+            default => $data['message_id'] ?? null,
+        };
     }
 
     /**
@@ -282,14 +377,30 @@ class WhatsAppService extends BaseApiClient
     {
         return $this->circuitBreaker->call($this->getServiceName(), function () {
             try {
+                $endpoint = match ($this->provider) {
+                    'yobase' => '/account/status',
+                    'wablas' => '/info',
+                    default => '/info',
+                };
+
                 $response = Http::timeout($this->timeout)
                     ->withToken($this->apiKey)
-                    ->get($this->buildUrl('/info'));
+                    ->get($this->buildUrl($endpoint));
 
-                return $response->json() ?? [];
+                $data = $response->json() ?? [];
+
+                return match ($this->provider) {
+                    'yobase' => [
+                        'status' => $data['data']['status'] ?? 'unknown',
+                        'phone' => $data['data']['phone_number'] ?? null,
+                        'quota' => $data['data']['quota'] ?? null,
+                    ],
+                    default => $data,
+                };
             } catch (\Throwable $e) {
                 Log::error('Failed to get WhatsApp account info', [
                     'error' => $e->getMessage(),
+                    'provider' => $this->provider,
                 ]);
                 return [];
             }

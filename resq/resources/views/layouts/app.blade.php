@@ -13,8 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @stack('styles')
     </head>
-    <body class="font-sans antialiased bg-slate-50">
+    <body class="font-sans antialiased bg-slate-950">
         <div class="min-h-screen flex flex-col pb-16 lg:pb-0">
             <!-- Page Content -->
             <main class="flex-1 page-transition">
@@ -29,5 +30,7 @@
         @auth
             <x-ai-chatbot />
         @endauth
+
+        @stack('scripts')
     </body>
 </html>

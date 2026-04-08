@@ -41,6 +41,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | WhatsApp API (Yobase)
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Yobase WhatsApp API gateway.
+    | API docs: https://yobase.io/docs/api
+    |
+    */
+
+    'whatsapp' => [
+        'provider' => env('WHATSAPP_PROVIDER', 'yobase'), // yobase, wablas, twilio
+        'api_url' => env('WHATSAPP_API_URL', 'https://whats.yobase.me/api'),
+        'api_token' => env('WHATSAPP_API_TOKEN'),
+        'sender_number' => env('WHATSAPP_SENDER_NUMBER'), // Registered number
+        'timeout' => env('WHATSAPP_TIMEOUT', 30),
+        'max_retries' => env('WHATSAPP_MAX_RETRIES', 3),
+        'retry_delay' => env('WHATSAPP_RETRY_DELAY', 2000),
+        'bulk_batch_size' => env('WHATSAPP_BULK_BATCH_SIZE', 100),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Fireworks AI
     |--------------------------------------------------------------------------
     |

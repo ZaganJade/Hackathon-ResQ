@@ -42,7 +42,8 @@ class MapController extends Controller
         $validated = $request->validate([
             'types' => 'nullable|array',
             'types.*' => 'string',
-            'severity' => 'nullable|string|in:low,medium,high,critical',
+            'severity' => 'nullable|array',
+            'severity.*' => 'string|in:low,medium,high,critical',
             'date_from' => 'nullable|date',
             'date_to' => 'nullable|date',
             'lat' => 'nullable|numeric|between:-90,90',
@@ -57,9 +58,9 @@ class MapController extends Controller
             $query->whereIn('type', $validated['types']);
         }
 
-        // Filter by severity
+        // Filter by severity (now supports multiple like types)
         if (!empty($validated['severity'])) {
-            $query->where('severity', $validated['severity']);
+            $query->whereIn('severity', $validated['severity']);
         }
 
         // Filter by date range

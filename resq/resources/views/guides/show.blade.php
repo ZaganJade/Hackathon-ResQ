@@ -1,265 +1,305 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="max-w-4xl mx-auto">
-            <!-- Breadcrumb -->
-            <nav class="flex items-center text-sm text-gray-500 mb-4">
-                <a href="{{ route('dashboard') }}" class="hover:text-gray-700">{{ __('Dashboard') }}</a>
-                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <a href="{{ route('guides.index') }}" class="hover:text-gray-700">{{ __('Panduan') }}</a>
-                <svg class="w-4 h-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-                <span class="text-gray-700 capitalize">{{ $guide->category }}</span>
-            </nav>
-        </div>
-    </x-slot>
+    @push('styles')
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    @endpush
 
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Guide Header -->
-        <div class="text-center mb-8">
-            <a href="{{ route('guides.category', $guide->category) }}"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full text-sm font-semibold mb-4 hover:shadow-lg transition-all">
-                @if($guide->category === 'earthquake')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                @elseif($guide->category === 'flood')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                    </svg>
-                @elseif($guide->category === 'landslide')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                    </svg>
-                @elseif($guide->category === 'tsunami')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                    </svg>
-                @elseif($guide->category === 'fire')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
-                    </svg>
-                @elseif($guide->category === 'volcano')
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
-                @else
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                @endif
-                <span class="capitalize">{{ $guide->category }}</span>
-            </a>
+    {{-- Guide Detail — Fluid Modern Dark Dashboard Style --}}
+    <div class="min-h-screen bg-slate-950 pb-24 lg:pb-8" x-data="{}" x-cloak>
 
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-4">
-                {{ $guide->title }}
-            </h1>
-
-            <div class="flex items-center justify-center gap-4 text-sm text-gray-500">
-                @if($guide->video_url)
-                    <span class="flex items-center gap-1 text-red-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                        {{ __('Video tersedia') }}
-                    </span>
-                @endif
-                <span class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                    </svg>
-                    {{ count($steps) }} {{ __('langkah') }}
-                </span>
-            </div>
-        </div>
-
-        <!-- Featured Image -->
-        @if($guide->image)
-            <div class="mb-8 rounded-2xl overflow-hidden shadow-lg">
-                <img src="{{ asset('storage/' . $guide->image) }}"
-                     alt="{{ $guide->title }}"
-                     class="w-full h-64 md:h-80 object-cover">
-            </div>
-        @endif
-
-        <!-- Video Embed -->
-        @if($guide->video_url)
-            <div class="mb-8">
-                <div class="aspect-video rounded-2xl overflow-hidden shadow-lg bg-gray-900">
-                    @if(str_contains($guide->video_url, 'youtube.com') || str_contains($guide->video_url, 'youtu.be'))
-                        @php
-                            $videoId = '';
-                            if (str_contains($guide->video_url, 'youtube.com/watch?v=')) {
-                                $videoId = explode('v=', $guide->video_url)[1] ?? '';
-                                $videoId = explode('&', $videoId)[0] ?? '';
-                            } elseif (str_contains($guide->video_url, 'youtu.be/')) {
-                                $videoId = explode('youtu.be/', $guide->video_url)[1] ?? '';
-                            }
-                        @endphp
-                        <iframe
-                            class="w-full h-full"
-                            src="https://www.youtube.com/embed/{{ $videoId }}"
-                            title="{{ $guide->title }}"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    @else
-                        <div class="w-full h-full flex items-center justify-center text-white">
-                            <a href="{{ $guide->video_url }}" target="_blank" class="flex items-center gap-2 text-lg hover:underline">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M10 12.5l8-5V3l-8 5v4.5zm0 0v4.5l8 5V17l-8-5z"/>
-                                </svg>
-                                {{ __('Tonton Video') }}
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        @endif
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2">
-                <!-- Introduction -->
-                @if($guide->content)
-                    <div class="prose prose-lg max-w-none prose-indigo mb-8">
-                        {!! $guide->content !!}
+        {{-- DESKTOP SIDEBAR --}}
+        <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col"
+               x-data="{ sidebarHover: false }"
+               @mouseenter="sidebarHover = true"
+               @mouseleave="sidebarHover = false">
+            <div class="h-full bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 shadow-soft-lg flex flex-col py-6 sidebar-spring overflow-hidden"
+                 :class="sidebarHover ? 'w-64' : 'w-[72px]'">
+                <div class="flex items-center gap-3 px-4 mb-8 overflow-hidden">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-400 flex items-center justify-center shrink-0 shadow-md">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                @endif
-
-                <!-- Steps -->
-                @if(count($steps) > 0)
-                    <div class="space-y-4">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                            </svg>
-                            {{ __('Langkah-langkah') }}
-                        </h2>
-
-                        @foreach($steps as $index => $step)
-                            <div class="flex gap-4 p-5 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                <div class="flex-shrink-0">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-bold flex items-center justify-center text-lg">
-                                        {{ $index + 1 }}
-                                    </div>
-                                </div>
-                                <div class="flex-1">
-                                    @if(is_array($step))
-                                        @if(isset($step['title']))
-                                            <h3 class="font-semibold text-gray-900 mb-2">{{ $step['title'] }}</h3>
-                                        @endif
-                                        @if(isset($step['description']))
-                                            <p class="text-gray-600">{{ $step['description'] }}</p>
-                                        @endif
-                                    @else
-                                        <p class="text-gray-600">{{ $step }}</p>
-                                    @endif
-                                </div>
+                    <span class="font-bold text-xl text-white whitespace-nowrap transition-opacity duration-300"
+                          :class="sidebarHover ? 'opacity-100' : 'opacity-0'">ResQ</span>
+                </div>
+                <nav class="flex-1 flex flex-col gap-1 px-3">
+                    @php
+                        $menuItems = [
+                            ['route' => 'dashboard', 'label' => 'Beranda', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', 'active' => 'dashboard'],
+                            ['route' => 'map.index', 'label' => 'Peta Interaktif', 'icon' => 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7', 'active' => 'map.*'],
+                            ['route' => 'guides.index', 'label' => 'Edukasi & Pelatihan', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', 'active' => 'guides.*'],
+                            ['route' => 'articles.index', 'label' => 'Berita & Info', 'icon' => 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z', 'active' => 'articles.*'],
+                            ['route' => 'chat-history.index', 'label' => 'Riwayat Chat', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'active' => 'chat-history.*'],
+                            ['route' => 'ai-assist.index', 'label' => 'AI Assistant', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'active' => 'ai-assist.*'],
+                            ['route' => 'profile.edit', 'label' => 'Profil', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'active' => 'profile.*'],
+                        ];
+                    @endphp
+                    @foreach($menuItems as $item)
+                        <a href="{{ route($item['route']) }}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group whitespace-nowrap
+                                  {{ request()->routeIs($item['active']) ? 'menu-active' : 'text-slate-400 hover:bg-white/5 hover:text-emerald-400' }}">
+                            <div class="w-7 h-7 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"></path>
+                                </svg>
                             </div>
-                        @endforeach
-                    </div>
-                @endif
-
-                <!-- AI Assist CTA -->
-                <div class="mt-10 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                            </svg>
+                            <span class="text-sm font-medium transition-opacity duration-300"
+                                  :class="sidebarHover ? 'opacity-100' : 'opacity-0'">{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </nav>
+                <div class="px-3 mt-auto">
+                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 overflow-hidden">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shrink-0 ring-2 ring-white/10">
+                            <span class="text-white font-bold text-xs">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                         </div>
-                        <div>
-                            <h3 class="font-semibold text-gray-900 mb-1">{{ __('Punya Pertanyaan?') }}</h3>
-                            <p class="text-gray-600 text-sm mb-3">
-                                {{ __('Tanyakan ke AI Assist ResQ untuk informasi lebih detail tentang mitigasi bencana ini.') }}
-                            </p>
-                            <a href="{{ route('ai-assist.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
-                                {{ __('Tanya AI Assist') }}
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                            </a>
+                        <div class="min-w-0 transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
+                            <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
+                            <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
                     </div>
                 </div>
+            </div>
+        </aside>
 
-                <!-- Related Guides -->
-                @if($relatedGuides->count() > 0)
-                    <div class="mt-10">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                            {{ __('Panduan Terkait') }}
-                        </h3>
-                        <div class="grid gap-4 md:grid-cols-2">
-                            @foreach($relatedGuides as $related)
-                                <a href="{{ route('guides.show', $related->slug) }}" class="group flex gap-4 p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-all">
-                                    @if($related->image)
-                                        <img src="{{ asset('storage/' . $related->image) }}" alt="" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
-                                    @else
-                                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex-shrink-0"></div>
-                                    @endif
-                                    <div>
-                                        <h4 class="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                                            {{ $related->title }}
-                                        </h4>
-                                        @if($related->steps)
-                                            <p class="text-xs text-gray-500 mt-1">
-                                                {{ count($related->getFormattedSteps()) }} {{ __('langkah') }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </a>
-                            @endforeach
+        {{-- MAIN CONTENT --}}
+        <div class="lg:ml-[72px]">
+
+            <div class="relative overflow-hidden glass-dark border-b border-white/5 pb-12">
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div class="absolute -top-16 -left-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 right-24 w-72 h-72 bg-emerald-700/10 rounded-full blur-3xl"></div>
+                </div>
+
+                {{-- Breadcrumb + Back --}}
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 relative z-10" data-aos="fade-down" data-aos-delay="100">
+                    <nav class="flex items-center gap-2 text-sm mb-6">
+                        <a href="{{ route('dashboard') }}" class="text-slate-400 hover:text-emerald-400 transition-colors">Dashboard</a>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <a href="{{ route('guides.index') }}" class="text-slate-400 hover:text-emerald-400 transition-colors">Panduan</a>
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <span class="text-white font-medium capitalize">{{ $guide->category }}</span>
+                    </nav>
+                </div>
+
+                {{-- Guide Header --}}
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-4 relative z-10">
+                    <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                        <a href="{{ route('guides.category', $guide->category) }}"
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
+                            <span class="capitalize">{{ $guide->category }}</span>
+                        </a>
+
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight mb-4 text-balance">
+                            {{ $guide->title }}
+                        </h1>
+
+                        <div class="flex items-center justify-center gap-4 text-sm text-slate-400">
+                            @if($guide->video_url)
+                                <span class="flex items-center gap-1.5 text-rose-400 font-medium bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                    </svg>
+                                    Video tersedia
+                                </span>
+                            @endif
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                {{ count($steps) }} langkah
+                            </span>
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Other Categories -->
-                @if($otherCategories->count() > 0)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sticky top-4">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                            </svg>
-                            {{ __('Kategori Lain') }}
-                        </h3>
-                        <div class="space-y-3">
-                            @foreach($otherCategories as $other)
-                                <a href="{{ route('guides.show', $other->slug) }}" class="group flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            {{-- Featured Image --}}
+            @if($guide->image)
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-10 relative z-20" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative group">
+                        <img src="{{ asset('storage/' . $guide->image) }}" alt="{{ $guide->title }}" class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                    </div>
+                </div>
+            @else
+                <div class="h-8"></div>
+            @endif
+
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12" data-aos="fade-up" data-aos-delay="400">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {{-- Main Content --}}
+                    <div class="lg:col-span-2 space-y-10">
+
+                        {{-- Video Embed --}}
+                        @if($guide->video_url)
+                            <div class="aspect-video rounded-2xl overflow-hidden shadow-lg bg-slate-900 border border-white/5" data-aos="fade-right" data-aos-delay="500">
+                                @if(str_contains($guide->video_url, 'youtube.com') || str_contains($guide->video_url, 'youtu.be'))
+                                    @php
+                                        $videoId = '';
+                                        if (str_contains($guide->video_url, 'youtube.com/watch?v=')) {
+                                            $videoId = explode('v=', $guide->video_url)[1] ?? '';
+                                            $videoId = explode('&', $videoId)[0] ?? '';
+                                        } elseif (str_contains($guide->video_url, 'youtu.be/')) {
+                                            $videoId = explode('youtu.be/', $guide->video_url)[1] ?? '';
+                                            $videoId = explode('?', $videoId)[0] ?? '';
+                                        }
+                                    @endphp
+                                    @if($videoId)
+                                        <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/{{ $videoId }}?rel=0&modestbranding=1" title="{{ $guide->title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-white">
+                                            <a href="{{ $guide->video_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-lg hover:text-emerald-400 transition-colors">
+                                                <svg class="w-8 h-8 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                Tonton Video di YouTube
+                                            </a>
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-white">
+                                        <a href="{{ $guide->video_url }}" target="_blank" class="flex items-center gap-2 text-lg hover:text-emerald-400 transition-colors">
+                                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M10 12.5l8-5V3l-8 5v4.5zm0 0v4.5l8 5V17l-8-5z"/></svg>
+                                            Tonton Video
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- Introduction HTML --}}
+                        @if($guide->content)
+                            <div class="prose prose-lg max-w-none prose-invert prose-emerald" data-aos="fade-up" data-aos-delay="600">
+                                {!! $guide->content !!}
+                            </div>
+                        @endif
+
+                        {{-- Steps --}}
+                        @if(count($steps) > 0)
+                            <div class="space-y-6">
+                                <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-3" data-aos="fade-up">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                                         </svg>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h4 class="text-sm font-medium text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
-                                            {{ $other->title }}
-                                        </h4>
-                                        <p class="text-xs text-gray-500 capitalize">{{ $other->category }}</p>
-                                    </div>
-                                </a>
-                            @endforeach
+                                    Langkah-langkah
+                                </h2>
+
+                                <div class="space-y-4">
+                                    @foreach($steps as $index => $step)
+                                        <div class="flex gap-4 p-5 glass-dark border border-white/5 rounded-2xl shadow-soft hover:bg-white/5 hover:border-emerald-500/30 transition-all duration-300" data-aos="fade-left" data-aos-delay="{{ $index * 100 }}">
+                                            <div class="flex-shrink-0">
+                                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white font-bold flex items-center justify-center text-sm shadow-md">
+                                                    {{ $index + 1 }}
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                @if(is_array($step))
+                                                    @if(isset($step['title']))
+                                                        <h3 class="font-bold text-slate-200 mb-1.5 text-lg">{{ $step['title'] }}</h3>
+                                                    @endif
+                                                    @if(isset($step['description']))
+                                                        <p class="text-[15px] text-slate-400 leading-relaxed">{{ $step['description'] }}</p>
+                                                    @endif
+                                                @else
+                                                    <p class="text-[15px] text-slate-400 leading-relaxed">{{ $step }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- AI Assist CTA --}}
+                        <div class="p-6 bg-gradient-to-br from-emerald-900/40 to-slate-800/40 rounded-2xl border border-emerald-500/20 shadow-lg relative overflow-hidden" data-aos="zoom-in" data-aos-delay="200">
+                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="flex items-start gap-4 relative z-10">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white mb-1.5">Punya Pertanyaan?</h3>
+                                    <p class="text-sm text-slate-400 mb-4">
+                                        Tanyakan ke AI Assist ResQ untuk informasi terperinci mengenai persiapan mitigasi ini.
+                                    </p>
+                                    <a href="{{ route('ai-assist.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-full text-sm font-bold shadow-lg shadow-white/10 hover:bg-slate-100 hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
+                                        Tanya ke AI
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                @endif
 
-                <!-- Back to Guides -->
-                <a href="{{ route('guides.index') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    {{ __('Kembali ke Panduan') }}
-                </a>
+                    {{-- Sidebar --}}
+                    <div class="space-y-6">
+                        @if($otherCategories->count() > 0)
+                            <div class="glass-dark rounded-2xl border border-white/5 shadow-soft p-5 sticky top-4" data-aos="fade-left" data-aos-delay="300">
+                                <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center border border-white/10">
+                                        <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                        </svg>
+                                    </div>
+                                    Kategori Lain
+                                </h3>
+                                <div class="space-y-2">
+                                    @foreach($otherCategories as $other)
+                                        <a href="{{ route('guides.show', $other->slug) }}" class="group flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all duration-300">
+                                            <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors shadow-inner">
+                                                <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="text-sm font-medium text-slate-300 group-hover:text-emerald-400 transition-colors truncate">{{ $other->title }}</h4>
+                                                <p class="text-xs text-slate-500 capitalize">{{ $other->category }}</p>
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <a href="{{ route('guides.index') }}" data-aos="fade-up" data-aos-delay="400" class="flex items-center justify-center gap-2 w-full px-4 py-3 glass-dark border border-white/5 rounded-xl shadow-soft text-sm font-medium text-slate-400 hover:text-emerald-400 hover:bg-white/5 hover:border-emerald-500/30 transition-all duration-300 active:scale-[0.98]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            Kembali ke Panduan Utama
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <!-- AOS Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50,
+                easing: 'ease-out-cubic'
+            });
+        });
+    </script>
+    @endpush
+
+    <style>
+        [x-cloak] { display: none !important; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .text-balance { text-wrap: balance; }
+        
+        /* Dark Theme Prose Overrides */
+        .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4, .prose-invert h5, .prose-invert h6 {
+            color: #f8fafc;
+        }
+        .prose-invert p, .prose-invert li {
+            color: #94a3b8;
+        }
+        .prose-invert a {
+            color: #34d399;
+            text-decoration-color: #059669;
+        }
+    </style>
 </x-app-layout>

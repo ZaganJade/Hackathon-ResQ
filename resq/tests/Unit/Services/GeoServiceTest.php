@@ -4,7 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Services\GeoService;
 use Illuminate\Support\Facades\Http;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class GeoServiceTest extends TestCase
 {
@@ -67,32 +67,37 @@ class GeoServiceTest extends TestCase
 
     public function test_get_severity_color_returns_correct_hex(): void
     {
-        $this->assertEquals('#DC2626', $this->geoService->getSeverityColor('critical'));
-        $this->assertEquals('#DC2626', $this->geoService->getSeverityColor('high'));
-        $this->assertEquals('#F59E0B', $this->geoService->getSeverityColor('medium'));
-        $this->assertEquals('#10B981', $this->geoService->getSeverityColor('low'));
-        $this->assertEquals('#6B7280', $this->geoService->getSeverityColor('unknown'));
+        // Updated colors for Tailwind v4 compatibility
+        $this->assertEquals('#f43f5e', $this->geoService->getSeverityColor('critical')); // Rose-500
+        $this->assertEquals('#f43f5e', $this->geoService->getSeverityColor('high')); // Rose-500
+        $this->assertEquals('#f59e0b', $this->geoService->getSeverityColor('medium')); // Amber-500
+        $this->assertEquals('#059669', $this->geoService->getSeverityColor('low')); // Emerald-600
+        $this->assertEquals('#6B7280', $this->geoService->getSeverityColor('unknown')); // Gray-500
     }
 
     public function test_get_severity_color_is_case_insensitive(): void
     {
-        $this->assertEquals('#DC2626', $this->geoService->getSeverityColor('HIGH'));
-        $this->assertEquals('#DC2626', $this->geoService->getSeverityColor('Critical'));
+        $this->assertEquals('#f43f5e', $this->geoService->getSeverityColor('HIGH'));
+        $this->assertEquals('#f43f5e', $this->geoService->getSeverityColor('Critical'));
     }
 
     public function test_get_map_config_returns_expected_structure(): void
     {
         $config = $this->geoService->getMapConfig();
 
-        $this->assertArrayHasKey('api_key', $config);
+        // Updated config structure for Leaflet + OpenStreetMap
+        $this->assertArrayHasKey('provider', $config);
+        $this->assertArrayHasKey('osm_tiles', $config);
         $this->assertArrayHasKey('center', $config);
         $this->assertArrayHasKey('zoom', $config);
         $this->assertArrayHasKey('max_zoom', $config);
         $this->assertArrayHasKey('min_zoom', $config);
+        $this->assertArrayHasKey('attribution', $config);
 
         $this->assertArrayHasKey('lat', $config['center']);
         $this->assertArrayHasKey('lng', $config['center']);
 
+        $this->assertEquals('leaflet', $config['provider']);
         $this->assertEquals(5, $config['zoom']);
         $this->assertEquals(18, $config['max_zoom']);
         $this->assertEquals(4, $config['min_zoom']);
@@ -109,24 +114,89 @@ class GeoServiceTest extends TestCase
         $this->assertLessThan(141, $config['center']['lng']);
     }
 
-    public function test_geocode_returns_null_when_api_key_missing(): void
+    public function test_geocode_returns_null_when_nominatim_returns_empty(): void
     {
-        // When API key is empty, should return null
-        config(['services.google.maps_api_key' => '']);
-        $service = new GeoService();
+        Http::fake([
+            'https://nominatim.openstreetmap.org/search*' => Http::response([], 200),
+        ]);
 
-        $result = $service->geocode('Jakarta');
+        $service = new GeoService();
+        $result = $service->geocode('InvalidLocationXYZ123');
 
         $this->assertNull($result);
     }
 
-    public function test_reverse_geocode_returns_null_when_api_key_missing(): void
+    public function test_geocode_returns_data_from_nominatim(): void
     {
-        config(['services.google.maps_api_key' => '']);
-        $service = new GeoService();
+        Http::fake([
+            'https://nominatim.openstreetmap.org/search*' => Http::response([
+                [
+                    'lat' => '-6.2088',
+                    'lon' => '106.8456',
+                    'display_name' => 'Jakarta, Indonesia',
+                ],
+            ], 200),
+        ]);
 
-        $result = $service->reverseGeocode(-6.2088, 106.8456);
+        $service = new GeoService();
+        $result = $service->geocode('Jakarta');
+
+        $this->assertNotNull($result);
+        $this->assertEquals(-6.2088, $result['lat']);
+        $this->assertEquals(106.8456, $result['lng']);
+        $this->assertEquals('Jakarta, Indonesia', $result['formatted_address']);
+        $this->assertEquals('nominatim', $result['source']);
+    }
+
+    public function test_reverse_geocode_returns_null_when_nominatim_returns_empty(): void
+    {
+        Http::fake([
+            'https://nominatim.openstreetmap.org/reverse*' => Http::response([
+                'error' => 'Unable to geocode',
+            ], 200),
+        ]);
+
+        $service = new GeoService();
+        $result = $service->reverseGeocode(-999, -999); // Invalid coordinates
 
         $this->assertNull($result);
+    }
+
+    public function test_reverse_geocode_returns_data_from_nominatim(): void
+    {
+        Http::fake([
+            'https://nominatim.openstreetmap.org/reverse*' => Http::response([
+                'display_name' => 'Monumen Nasional, Jakarta, Indonesia',
+                'lat' => '-6.1754',
+                'lon' => '106.8272',
+            ], 200),
+        ]);
+
+        $service = new GeoService();
+        $result = $service->reverseGeocode(-6.1754, 106.8272);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('Monumen Nasional, Jakarta, Indonesia', $result);
+    }
+
+    public function test_geocode_adds_indonesia_bias_when_not_present(): void
+    {
+        Http::fake(function ($request) {
+            $url = $request->url();
+
+            // Check that query includes Indonesia
+            $this->assertStringContainsString('Jakarta%2C+Indonesia', $url);
+
+            return Http::response([
+                [
+                    'lat' => '-6.2088',
+                    'lon' => '106.8456',
+                    'display_name' => 'Jakarta, Indonesia',
+                ],
+            ], 200);
+        });
+
+        $service = new GeoService();
+        $service->geocode('Jakarta');
     }
 }

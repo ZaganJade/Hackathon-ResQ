@@ -93,7 +93,7 @@ export default {
                 '800': '800ms',
             },
 
-            // Custom animations
+            // Custom animations - Fluid Modern Dashboard
             animation: {
                 'fade-up': 'fadeUp 600ms ease-out forwards',
                 'fade-in': 'fadeIn 400ms ease-out forwards',
@@ -103,6 +103,11 @@ export default {
                 'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
                 'slide-up': 'slideUp 500ms ease-out forwards',
                 'bounce-soft': 'bounceSoft 2s infinite',
+                'slide-in-left': 'slideInLeft 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                'slide-out-left': 'slideOutLeft 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                'float': 'float 3s ease-in-out infinite',
+                'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+                'spin-slow': 'spin 3s linear infinite',
             },
 
             keyframes: {
@@ -137,6 +142,22 @@ export default {
                 bounceSoft: {
                     '0%, 100%': { transform: 'translateY(-5%)' },
                     '50%': { transform: 'translateY(0)' },
+                },
+                slideInLeft: {
+                    '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                    '100%': { opacity: '1', transform: 'translateX(0)' },
+                },
+                slideOutLeft: {
+                    '0%': { opacity: '1', transform: 'translateX(0)' },
+                    '100%': { opacity: '0', transform: 'translateX(-20px)' },
+                },
+                float: {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                },
+                glowPulse: {
+                    '0%, 100%': { boxShadow: '0 0 20px rgba(52, 211, 153, 0.3)' },
+                    '50%': { boxShadow: '0 0 40px rgba(52, 211, 153, 0.6)' },
                 },
             },
         },

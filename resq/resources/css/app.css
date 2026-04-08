@@ -130,7 +130,7 @@
        Card Components
        ============================================ */
     .card {
-        @apply bg-white rounded-2xl shadow-card transition-all duration-300;
+        @apply rounded-2xl shadow-card transition-all duration-300;
         @apply hover:shadow-card-hover hover:-translate-y-1;
     }
 
@@ -225,6 +225,90 @@
     .page-transition {
         @apply opacity-0;
         animation: fadeIn 300ms ease-out 100ms forwards;
+    }
+
+    /* ============================================
+       Fluid Modern Dashboard - Additional Styles
+       ============================================ */
+
+    /* Sidebar Spring Animation */
+    .sidebar-spring {
+        transition: width 400ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Card Hover Effects */
+    .card-fluid {
+        @apply rounded-2xl transition-all duration-300;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-fluid:hover {
+        transform: scale(1.02) translateY(-4px);
+        box-shadow: 0 20px 40px -8px rgba(5, 150, 105, 0.2);
+    }
+
+    /* AI Search Bar Glow */
+    .search-glow {
+        transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .search-glow:focus-within {
+        box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2), 0 10px 40px -4px rgba(5, 150, 105, 0.3);
+        transform: scale(1.01);
+    }
+
+    /* Alert Pulse */
+    .alert-pulse {
+        animation: alertPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes alertPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.85; }
+    }
+
+    /* Stagger Children Animation */
+    .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+    .stagger-children > *:nth-child(2) { animation-delay: 80ms; }
+    .stagger-children > *:nth-child(3) { animation-delay: 160ms; }
+    .stagger-children > *:nth-child(4) { animation-delay: 240ms; }
+    .stagger-children > *:nth-child(5) { animation-delay: 320ms; }
+    .stagger-children > *:nth-child(6) { animation-delay: 400ms; }
+
+    /* Menu Item Active State */
+    .menu-active {
+        @apply bg-emerald-500/10 text-emerald-400;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Quick Action Hover */
+    .quick-action {
+        @apply relative overflow-hidden transition-all duration-300;
+    }
+
+    .quick-action::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-br from-primary-400/0 to-primary-400/0;
+        transition: all 300ms ease;
+    }
+
+    .quick-action:hover::before {
+        @apply from-emerald-400/10 to-emerald-400/5;
+    }
+
+    /* Tip Carousel */
+    .tip-slide {
+        transition: opacity 500ms ease, transform 500ms ease;
+    }
+
+    /* Glass Effect */
+    .glass {
+        @apply bg-white/[0.06] backdrop-blur-xl;
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-600;
     }
 }
 

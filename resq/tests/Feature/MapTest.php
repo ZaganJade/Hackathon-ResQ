@@ -171,13 +171,26 @@ class MapTest extends TestCase
     public function test_api_filters_disasters_by_severity(): void
     {
         $response = $this->getJson(route('api.disasters.index', [
-            'severity' => 'high',
+            'severity' => ['high'],
         ]));
 
         $response->assertStatus(200);
 
         foreach ($response->json('features') as $feature) {
             $this->assertEquals('high', $feature['properties']['severity']);
+        }
+    }
+
+    public function test_api_filters_disasters_by_multiple_severities(): void
+    {
+        $response = $this->getJson(route('api.disasters.index', [
+            'severity' => ['high', 'critical'],
+        ]));
+
+        $response->assertStatus(200);
+
+        foreach ($response->json('features') as $feature) {
+            $this->assertContains($feature['properties']['severity'], ['high', 'critical']);
         }
     }
 
@@ -236,19 +249,13 @@ class MapTest extends TestCase
 
     public function test_geocode_endpoint_returns_coordinates(): void
     {
+        // Mock Nominatim (OpenStreetMap) geocoding - free, no API key needed
         Http::fake([
-            'https://maps.googleapis.com/maps/api/geocode/json*' => Http::response([
-                'status' => 'OK',
-                'results' => [
-                    [
-                        'geometry' => [
-                            'location' => [
-                                'lat' => -6.2088,
-                                'lng' => 106.8456,
-                            ],
-                        ],
-                        'formatted_address' => 'Jakarta, Indonesia',
-                    ],
+            'https://nominatim.openstreetmap.org/search*' => Http::response([
+                [
+                    'lat' => '-6.2088',
+                    'lon' => '106.8456',
+                    'display_name' => 'Jakarta, Indonesia',
                 ],
             ], 200),
         ]);
@@ -263,6 +270,7 @@ class MapTest extends TestCase
                     'lat',
                     'lng',
                     'formatted_address',
+                    'source',
                 ],
                 'nearby_disasters' => [
                     'count',
@@ -271,16 +279,15 @@ class MapTest extends TestCase
             ])
             ->assertJsonPath('location.lat', -6.2088)
             ->assertJsonPath('location.lng', 106.8456)
-            ->assertJsonPath('location.formatted_address', 'Jakarta, Indonesia');
+            ->assertJsonPath('location.formatted_address', 'Jakarta, Indonesia')
+            ->assertJsonPath('location.source', 'nominatim');
     }
 
     public function test_geocode_returns_404_for_invalid_location(): void
     {
+        // Mock Nominatim returning empty results
         Http::fake([
-            'https://maps.googleapis.com/maps/api/geocode/json*' => Http::response([
-                'status' => 'ZERO_RESULTS',
-                'results' => [],
-            ], 200),
+            'https://nominatim.openstreetmap.org/search*' => Http::response([], 200),
         ]);
 
         $response = $this->getJson(route('api.geocode', [
@@ -377,10 +384,10 @@ class MapTest extends TestCase
             $color = $feature['properties']['color'];
 
             match ($severity) {
-                'critical', 'high' => $this->assertEquals('#DC2626', $color),
-                'medium' => $this->assertEquals('#F59E0B', $color),
-                'low' => $this->assertEquals('#10B981', $color),
-                default => $this->assertEquals('#6B7280', $color),
+                'critical', 'high' => $this->assertEquals('#f43f5e', $color), // Rose-500 (Tailwind v4)
+                'medium' => $this->assertEquals('#f59e0b', $color), // Amber-500
+                'low' => $this->assertEquals('#059669', $color), // Emerald-600
+                default => $this->assertEquals('#6B7280', $color), // Gray-500
             };
         }
     }
@@ -389,14 +396,14 @@ class MapTest extends TestCase
     {
         $response = $this->getJson(route('api.disasters.index', [
             'types' => ['earthquake', 'flood', 'landslide'],
-            'severity' => 'high',
+            'severity' => ['high', 'critical'],
             'date_from' => now()->subDays(7)->format('Y-m-d'),
             'date_to' => now()->format('Y-m-d'),
         ]));
 
         $response->assertStatus(200)
             ->assertJsonPath('meta.filters.types', ['earthquake', 'flood', 'landslide'])
-            ->assertJsonPath('meta.filters.severity', 'high')
+            ->assertJsonPath('meta.filters.severity', ['high', 'critical'])
             ->assertJsonPath('meta.filters.date_from', now()->subDays(7)->format('Y-m-d'));
     }
 
@@ -427,12 +434,12 @@ class MapTest extends TestCase
             ->get(route('map.index'));
 
         $response->assertStatus(200)
-            ->assertSee('google.maps.Map')
-            ->assertSee('initMap')
+            ->assertSee('leaflet')
+            ->assertSee('L.map')
             ->assertSee('loadDisasters')
-            ->assertSee('MarkerClusterer')
+            ->assertSee('markerCluster')
             ->assertSee('autoRefreshInterval')
-            ->assertSee('infoWindow');
+            ->assertSee('bindPopup');
     }
 
     public function test_map_page_includes_filter_ui_elements(): void
