@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AIAssistController;
 use App\Http\Controllers\ChatHistoryController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,17 +35,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat-history/{conversationId}/restore', [ChatHistoryController::class, 'restore'])->name('chat-history.restore');
     Route::get('/chat-history/{conversationId}/export', [ChatHistoryController::class, 'export'])->name('chat-history.export');
 
-    // Notification Preference Routes (Task 9)
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
-    Route::delete('/notifications', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    // Disaster Map Routes (Task 7)
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
 });
 
-// Admin Routes (Task 9)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/notifications/logs', [NotificationController::class, 'adminLogs'])->name('notifications.logs');
-    Route::get('/notifications/stats', [NotificationController::class, 'stats'])->name('notifications.stats');
-});
+// Map API Routes (public)
+Route::get('/api/disasters', [MapController::class, 'getDisasters'])->name('api.disasters.index');
+Route::get('/api/disasters/stats', [MapController::class, 'getStats'])->name('api.disasters.stats');
+Route::get('/api/disasters/{disaster}', [MapController::class, 'show'])->name('api.disasters.show');
+Route::get('/api/geocode', [MapController::class, 'geocode'])->name('api.geocode');
 
 require __DIR__.'/auth.php';
 

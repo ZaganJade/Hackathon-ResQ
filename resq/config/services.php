@@ -35,9 +35,8 @@ return [
         ],
     ],
 
-    'whatsapp' => [
-        'api_url'   => env('WHATSAPP_API_URL', ''),
-        'api_token' => env('WHATSAPP_API_TOKEN', ''),
+    'google' => [
+        'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
 ];
