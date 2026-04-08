@@ -32,9 +32,9 @@ class SecurityHeaders
         // Content Security Policy (CSP) - Adjust as needed for your frontend
         $csp = "default-src 'self'; " .
                "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com; " .
-               "style-src 'self' 'unsafe-inline' *.googleapis.com fonts.googleapis.com; " .
+               "style-src 'self' 'unsafe-inline' *.googleapis.com fonts.googleapis.com fonts.bunny.net; " .
                "img-src 'self' data: blob: *.googleapis.com *.gstatic.com *.google.com; " .
-               "font-src 'self' fonts.gstatic.com; " .
+               "font-src 'self' fonts.gstatic.com fonts.bunny.net; " .
                "connect-src 'self' *.fireworks.ai *.googleapis.com *.wablas.com; " .
                "frame-src 'self'; " .
                "object-src 'none'; " .

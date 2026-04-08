@@ -26,10 +26,10 @@ class ApiMonitor
 
     public function __construct()
     {
-        $config = config('services.external_api.monitoring');
+        $config = config('services.external_api.monitoring') ?? [];
         $this->alertThreshold = $config['alert_threshold'] ?? 0.1; // 10%
         $this->windowMinutes = $config['window_minutes'] ?? 5;
-        $this->slackWebhook = $config['slack_webhook'];
+        $this->slackWebhook = $config['slack_webhook'] ?? null;
         $this->logEnabled = $config['log_enabled'] ?? true;
     }
 

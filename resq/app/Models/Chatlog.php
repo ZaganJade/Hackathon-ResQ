@@ -105,8 +105,8 @@ class Chatlog extends Model
 
         $avgResponseTime = static::forUser($userId)
             ->where('role', 'assistant')
-            ->whereNotNull('metadata->response_time')
-            ->selectRaw('AVG(CAST(metadata->>"response_time" AS DECIMAL(10,3))) as avg_time')
+            ->whereRaw("metadata->>'response_time' IS NOT NULL")
+            ->selectRaw("AVG(CAST(metadata->>'response_time' AS DECIMAL(10,3))) as avg_time")
             ->first()
             ?->avg_time ?? 0;
 

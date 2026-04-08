@@ -156,7 +156,7 @@
                         const metaCsrf = document.querySelector('meta[name="csrf-token"]');
                         const csrfToken = metaCsrf ? metaCsrf.getAttribute('content') : '';
 
-                        const response = await fetch('/ai/chat', {
+                        const response = await fetch('/ai-assist/chat', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -171,20 +171,23 @@
                         }
 
                         const data = await response.json();
-                        
-                        // Extract message based on typical AI API response patterns
-                        const reply = data.message || data.response || data.reply || data.answer || 'Maaf, saya tidak dapat merespons saat ini.';
+
+                        // Extract message - backend returns 'reply' field
+                        const reply = data.reply || data.message || data.response || data.answer || 'Maaf, saya tidak dapat merespons saat ini.';
                         
                         this.messages.push({ 
                             role: 'assistant', 
                             content: reply 
                         });
                     } catch (error) {
-                        this.messages.push({ 
-                            role: 'assistant', 
-                            content: 'Terjadi kesalahan jaringan atau server. Mohon coba beberapa saat lagi.' 
+                        let errorMessage = 'Terjadi kesalahan jaringan atau server. Mohon coba beberapa saat lagi.';
+                        if (error.message) {
+                            console.error('AI Chat Error:', error.message);
+                        }
+                        this.messages.push({
+                            role: 'assistant',
+                            content: errorMessage
                         });
-                        console.error('AI Chat Error:', error);
                     } finally {
                         this.isLoading = false;
                         this.scrollToBottom();
