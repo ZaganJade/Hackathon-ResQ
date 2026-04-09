@@ -30,13 +30,40 @@
                         </a>
                     @endforeach
                 </nav>
-                <div class="px-3 mt-auto">
-                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 overflow-hidden">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-emerald-500 flex items-center justify-center shrink-0 ring-2 ring-white"><span class="text-white font-bold text-xs">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span></div>
-                        <div class="min-w-0 transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
+                <div class="px-3 mt-auto relative" x-data="{ openOptions: false }">
+                    <button @click="openOptions = !openOptions" @click.away="openOptions = false" class="relative z-[90] w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 overflow-hidden transition-all duration-200 group focus:outline-none">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shrink-0 ring-2 ring-white/10 group-hover:ring-emerald-500/50 transition-all">
+                            <span class="text-white font-bold text-xs">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
+                        </div>
+                        <div class="min-w-0 text-left transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
                             <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
+                    </button>
+                    
+                    {{-- Dropdown Menu --}}
+                    <div x-show="openOptions" 
+                         x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-95" 
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
+                         x-transition:leave="transition ease-in duration-150" 
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                         class="absolute  left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1"
+                         style="bottom: 100%; margin-bottom: 8px; display: none;">
+                        
+                        <a href="{{ route('profile.edit') }}" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            Edit Profil
+                        </a>
+                        
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

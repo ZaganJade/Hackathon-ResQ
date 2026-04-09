@@ -37,6 +37,9 @@ return [
 
     'google' => [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', '/auth/google/callback'),
     ],
 
     /*
@@ -102,6 +105,20 @@ return [
             'slack_webhook' => env('API_MONITOR_SLACK_WEBHOOK'),
             'log_enabled' => env('API_MONITOR_LOG_ENABLED', true),
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webhook API Keys
+    |--------------------------------------------------------------------------
+    |
+    | API keys for 3rd party webhook access (BMKG, etc.)
+    |
+    */
+
+    'webhook' => [
+        'api_key' => env('WEBHOOK_API_KEY'), // Primary key for single client
+        'api_keys' => explode(',', env('WEBHOOK_API_KEYS', '')), // Multiple keys for multiple clients
     ],
 
 ];

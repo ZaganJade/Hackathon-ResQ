@@ -27,6 +27,11 @@ class User extends Authenticatable
         'phone',
         'preferences',
         'is_admin',
+        'google_id',
+        'avatar',
+        'provider',
+        'provider_id',
+        'email_verified_at',
     ];
 
     /**
