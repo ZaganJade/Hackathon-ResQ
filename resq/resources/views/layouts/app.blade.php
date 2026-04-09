@@ -5,10 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        {{-- Anti-cache meta tags for favicon --}}
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-        <meta http-equiv="Pragma" content="no-cache">
-        <meta http-equiv="Expires" content="0">
+        {{-- Cache control: allow assets to be cached --}}
+        <meta http-equiv="Cache-Control" content="public, max-age=3600">
 
         {{-- Favicon with multiple formats for best compatibility --}}
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}?v=2">

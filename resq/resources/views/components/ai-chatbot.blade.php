@@ -1,11 +1,11 @@
 <div
-    x-data="chatbotWithLocation()"
+    x-data="chatbotLazy()"
     class="fixed bottom-20 right-6 z-50 hidden lg:flex flex-col items-end"
     style="position: fixed; bottom: 5.5rem; right: 1.5rem; z-index: 9999;"
 >
-    <!-- Chat Window -->
+    <!-- Chat Window - Only render when opened -->
+    <template x-if="isOpen">
     <div
-        x-show="isOpen"
         x-transition:enter="transition ease-out duration-300 transform"
         x-transition:enter-start="opacity-0 translate-y-4 scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -13,7 +13,8 @@
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 scale-95"
         class="w-[300px] sm:w-[330px] rounded-2xl overflow-hidden mb-4 flex flex-col bg-slate-900/95 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/50"
-        style="height: 520px; max-height: calc(100vh - 100px); display: none;"
+        style="height: 520px; max-height: calc(100vh - 100px);"
+        x-data="chatbotWithLocation()"
     >
         <!-- Header (matches AI Assist top bar) -->
         <div class="flex-shrink-0 border-b border-white/[0.06] px-4 py-3"
@@ -185,6 +186,7 @@
             </div>
         </div>
     </div>
+    </template>
 
     <!-- Floating Toggle Button -->
     <button 
@@ -314,6 +316,12 @@
             }));
 
             // Location-aware chatbot
+            // Lazy wrapper - only manages open/close state
+            Alpine.data('chatbotLazy', () => ({
+                isOpen: false
+            }));
+
+            // Full chatbot with location - only loads when opened
             Alpine.data('chatbotWithLocation', () => ({
                 isOpen: false,
                 newMessage: '',
@@ -347,13 +355,9 @@
                         }
                     });
 
-                    // Try to get location on init
-                    if (navigator.geolocation) {
-                        this.requestLocation();
-                    } else {
-                        this.locationStatus = 'error';
-                        this.locationErrorMessage = 'Browser tidak mendukung geolocation';
-                    }
+                    // Don't request location on init - wait for chat to open
+                // This improves page load performance
+                this.locationStatus = 'idle';
                 },
 
                 async requestLocation() {
