@@ -39,15 +39,40 @@
                         </a>
                     @endforeach
                 </nav>
-                <div class="px-3 mt-auto">
-                    <div class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 overflow-hidden">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-emerald-500 flex items-center justify-center shrink-0 ring-2 ring-white">
+                <div class="px-3 mt-auto relative" x-data="{ openOptions: false }">
+                    <button @click="openOptions = !openOptions" @click.away="openOptions = false" class="relative z-[90] w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 overflow-hidden transition-all duration-200 group focus:outline-none">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shrink-0 ring-2 ring-white/10 group-hover:ring-emerald-500/50 transition-all">
                             <span class="text-white font-bold text-xs">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                         </div>
-                        <div class="min-w-0 transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
+                        <div class="min-w-0 text-left transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">
                             <p class="text-sm font-semibold text-white truncate">{{ Auth::user()->name }}</p>
                             <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
+                    </button>
+                    
+                    {{-- Dropdown Menu --}}
+                    <div x-show="openOptions" 
+                         x-transition:enter="transition ease-out duration-200" 
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-95" 
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
+                         x-transition:leave="transition ease-in duration-150" 
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                         class="absolute  left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1"
+                         style="bottom: 100%; margin-bottom: 8px; display: none;">
+                        
+                        <a href="{{ route('profile.edit') }}" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            Edit Profil
+                        </a>
+                        
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -81,7 +106,7 @@
                             <div class="relative flex-1 sm:w-72">
                                 <input type="text" name="search" value="{{ $searchQuery ?? '' }}" placeholder="Cari artikel..."
                                        class="w-full bg-white/80 backdrop-blur-sm border-0 rounded-full pl-10 pr-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 shadow-sm">
-                                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-1 right-1.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                                 @if($searchQuery ?? false)
@@ -146,7 +171,7 @@
                                                 <img src="{{ asset('storage/' . $article->image) }}" alt="{{ $article->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                                                 @if($article->category)
-                                                    <span class="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700 shadow-sm">
+                                                    <span class="absolute top-3 left-1 right-1 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700 shadow-sm">
                                                         {{ ucfirst($article->category) }}
                                                     </span>
                                                 @endif
@@ -155,7 +180,7 @@
                                             <div class="h-28 bg-gradient-to-br from-sky-100 via-primary-50 to-emerald-100 relative flex items-center justify-center overflow-hidden">
                                                 <svg class="w-10 h-10 text-primary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                                                 @if($article->category)
-                                                    <span class="absolute top-3 left-3 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700">{{ ucfirst($article->category) }}</span>
+                                                    <span class="absolute top-3 left-1 right-1 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700">{{ ucfirst($article->category) }}</span>
                                                 @endif
                                             </div>
                                         @endif
@@ -214,7 +239,7 @@
                                     <article class="card-fluid bg-white rounded-2xl shadow-card overflow-hidden group">
                                         <div class="h-28 bg-gradient-to-br {{ $article['color'] }} relative flex items-center justify-center overflow-hidden">
                                             <svg class="w-10 h-10 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                                            <span class="absolute top-3 left-3 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700">{{ $article['category'] }}</span>
+                                            <span class="absolute top-3 left-1 right-1 px-3 py-1 bg-white/80 backdrop-blur-sm rounded-full text-xs font-bold text-primary-700">{{ $article['category'] }}</span>
                                         </div>
                                         <div class="p-5">
                                             <div class="flex items-center gap-3 text-xs text-slate-400 mb-3">
