@@ -10,7 +10,8 @@
       "Bash(composer require:*)",
       "Bash(chmod +x resq/scripts/queue-worker.sh)",
       "Bash(php -m)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(findstr google:*)"
     ]
   }
 }
