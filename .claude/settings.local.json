@@ -11,7 +11,10 @@
       "Bash(chmod +x resq/scripts/queue-worker.sh)",
       "Bash(php -m)",
       "Bash(npm install:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(ls:*)",
+      "Bash(/c/laragon/bin/php/php-8.2.10-Win32-vs16-x64/php.exe -m)",
+      "Bash(/c/laragon/bin/php/php-8.2.10-Win32-vs16-x64/php.exe -r \"echo phpinfo\\(\\);\")"
     ]
   }
 }
