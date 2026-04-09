@@ -11,7 +11,9 @@
       "Bash(chmod +x resq/scripts/queue-worker.sh)",
       "Bash(php -m)",
       "Bash(npm install:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(php -r ':*)",
+      "Bash(php:*)"
     ]
   }
 }

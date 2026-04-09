@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="ResQ — Platform mitigasi bencana berbasis AI untuk Indonesia. Peta interaktif, panduan darurat, dan asisten AI 24/7.">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>{{ config('app.name', 'ResQ') }} — Sistem Mitigasi Bencana Berbasis AI</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -187,7 +188,7 @@
                     ['value'=>'AI','label'=>'Asisten Pintar','color'=>'from-emerald-400 to-primary-400','delay'=>'delay-100'],
                     ['value'=>'24/7','label'=>'Monitoring Aktif','color'=>'from-sky-400 to-blue-400','delay'=>'delay-200'],
                     ['value'=>'Real-time','label'=>'Update Peta','color'=>'from-amber-400 to-orange-400','delay'=>'delay-300'],
-                    ['value'=>'100%','label'=>'Info Terpercaya','color'=>'from-violet-400 to-purple-400','delay'=>'delay-400'],
+                    ['value'=>'100%','label'=>'Info Terpercaya','color'=>'from-emerald-400 to-green-400','delay'=>'delay-400'],
                 ]; @endphp
                 @foreach($stats as $stat)
                     <div class="text-center p-4 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.06] transition-all duration-300 opacity-0-start animate-slide-up {{ $stat['delay'] }}">
@@ -212,9 +213,9 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
                 @php $features = [
                     ['title'=>'AI Assist','desc'=>'Asisten AI yang siap 24/7 memberikan panduan darurat dan jawaban terkait bencana.','icon'=>'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z','color'=>'from-emerald-500 to-primary-500','bg'=>'bg-emerald-500/10','text'=>'text-emerald-400','delay'=>'delay-100'],
-                    ['title'=>'Peta Bencana','desc'=>'Pantau lokasi bencana real-time dengan peta interaktif dan filter lengkap.','icon'=>'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7','color'=>'from-sky-500 to-blue-500','bg'=>'bg-sky-500/10','text'=>'text-sky-400','delay'=>'delay-200'],
+                    ['title'=>'Peta Bencana','desc'=>'Pantau lokasi bencana real-time dengan peta interaktif dan filter lengkap.','icon'=>'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7','color'=>'from-emerald-500 to-green-500','bg'=>'bg-emerald-500/10','text'=>'text-emerald-400','delay'=>'delay-200'],
                     ['title'=>'Artikel Mitigasi','desc'=>'Akses artikel terkini tentang mitigasi, tips persiapan, dan informasi penting.','icon'=>'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z','color'=>'from-amber-500 to-orange-500','bg'=>'bg-amber-500/10','text'=>'text-amber-400','delay'=>'delay-300'],
-                    ['title'=>'Panduan Darurat','desc'=>'Panduan lengkap cara menghadapi berbagai jenis bencana dari gempa hingga banjir.','icon'=>'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253','color'=>'from-violet-500 to-purple-500','bg'=>'bg-violet-500/10','text'=>'text-violet-400','delay'=>'delay-400'],
+                    ['title'=>'Panduan Darurat','desc'=>'Panduan lengkap cara menghadapi berbagai jenis bencana dari gempa hingga banjir.','icon'=>'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253','color'=>'from-emerald-500 to-green-500','bg'=>'bg-emerald-500/10','text'=>'text-emerald-400','delay'=>'delay-400'],
                 ]; @endphp
                 @foreach($features as $f)
                     <div class="feature-card glass-dark rounded-2xl p-6 opacity-0-start animate-slide-up {{ $f['delay'] }}">
@@ -242,7 +243,7 @@
             <div class="grid md:grid-cols-3 gap-6 sm:gap-8">
                 @php $steps = [
                     ['num'=>'01','title'=>'Daftar Akun','desc'=>'Buat akun ResQ gratis untuk mengakses semua fitur dan notifikasi.','color'=>'from-emerald-500 to-primary-500','delay'=>'delay-200'],
-                    ['num'=>'02','title'=>'Jelajahi Fitur','desc'=>'Gunakan AI Assist, pantau peta bencana, dan pelajari panduan darurat.','color'=>'from-sky-500 to-blue-500','delay'=>'delay-300'],
+                    ['num'=>'02','title'=>'Jelajahi Fitur','desc'=>'Gunakan AI Assist, pantau peta bencana, dan pelajari panduan darurat.','color'=>'from-emerald-500 to-green-500','delay'=>'delay-300'],
                     ['num'=>'03','title'=>'Siap Siaga','desc'=>'Aktifkan notifikasi WhatsApp untuk peringatan dini dan informasi terkini.','color'=>'from-amber-500 to-orange-500','delay'=>'delay-400'],
                 ]; @endphp
                 @foreach($steps as $step)
@@ -317,7 +318,7 @@
                                 ['v'=>'AI','l'=>'Powered','c'=>'from-emerald-400 to-primary-400'],
                                 ['v'=>'24/7','l'=>'Support','c'=>'from-sky-400 to-blue-400'],
                                 ['v'=>'Real','l'=>'Time','c'=>'from-amber-400 to-orange-400'],
-                                ['v'=>'Safe','l'=>'First','c'=>'from-violet-400 to-purple-400'],
+                                ['v'=>'Safe','l'=>'First','c'=>'from-emerald-400 to-green-400'],
                             ]; @endphp
                             @foreach($aboutStats as $as)
                                 <div class="bg-white/[0.03] rounded-2xl p-5 text-center border border-white/[0.05] hover:bg-white/[0.06] transition-all duration-300">
