@@ -36,6 +36,25 @@
             <x-mobile-bottom-nav />
         </div>
 
+        <!-- Global Footer -->
+        <footer class="bg-slate-900 border-t border-white/5 py-4 mt-auto">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        <span class="font-semibold text-white">ResQ</span>
+                        <span class="hidden sm:inline">|</span>
+                        <span>&copy; {{ date('Y') }} Team ResQ. Hak Cipta Dilindungi.</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs">Siap hadapi bencana alam sebelum, sesaat, dan sesudah.<br> dengan ResQ panduan selamat yang selalu ada di genggaman.</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
         <!-- AI Chatbot Floating Widget -->
         @auth
             <x-ai-chatbot />

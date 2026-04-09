@@ -69,12 +69,46 @@
             </div>
             <p class="text-slate-300 mb-2">Akses lokasi ditolak</p>
             <p class="text-sm text-slate-400 mb-4">Aktifkan izin lokasi di browser Anda untuk fitur peringatan bencana</p>
-            <button
-                @click="requestLocation()"
-                class="text-emerald-400 hover:underline text-sm"
-            >
-                Coba Lagi
-            </button>
+            <div class="flex flex-col gap-2">
+                <button
+                    @click="requestLocation()"
+                    class="text-emerald-400 hover:underline text-sm"
+                >
+                    Coba Lagi
+                </button>
+                @if(auth()->check() && auth()->user()->locations()->exists())
+                <button
+                    @click="useSavedLocation()"
+                    class="text-sm bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg transition"
+                >
+                    Gunakan Lokasi Tersimpan
+                </button>
+                @endif
+                <a href="{{ route('locations.create') }}" class="text-sm text-slate-400 hover:text-white transition">
+                    + Tambah Lokasi Baru
+                </a>
+            </div>
+        </div>
+
+        <!-- Using Saved Location State -->
+        <div x-show="status === 'saved'" class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </div>
+            <p class="text-slate-300 mb-2">Menggunakan Lokasi Tersimpan</p>
+            <p class="text-sm text-emerald-400 mb-4" x-text="savedLocationName"></p>
+            <div class="flex justify-center gap-2">
+                <a href="{{ route('locations.index') }}" class="text-xs text-slate-400 hover:text-white transition">
+                    Kelola Lokasi
+                </a>
+                <span class="text-slate-600">|</span>
+                <button @click="requestLocation()" class="text-xs text-emerald-400 hover:underline">
+                    Gunakan Lokasi Real-time
+                </button>
+            </div>
         </div>
 
         <!-- Warning State (Permission Denied but with warning icon variation) -->
@@ -255,7 +289,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('zoneStatusWidget', () => ({
-                status: 'requesting', // requesting, loading, active, denied, error
+                status: 'requesting', // requesting, loading, active, denied, error, saved
                 isLoading: false,
                 latitude: null,
                 longitude: null,
@@ -272,12 +306,13 @@
                 nearbyDisasters: [],
                 lastUpdated: '',
                 errorMessage: '',
+                savedLocationName: '',
 
                 init() {
                     // Check if geolocation is available
                     if (!navigator.geolocation) {
-                        this.status = 'error';
-                        this.errorMessage = 'Browser Anda tidak mendukung geolocation';
+                        // Try to use saved location as fallback
+                        this.tryUseSavedLocation();
                         return;
                     }
 
@@ -298,6 +333,25 @@
                     } catch (error) {
                         this.handleLocationError(error);
                     }
+                },
+
+                async useSavedLocation() {
+                    this.status = 'loading';
+                    this.tryUseSavedLocation();
+                },
+
+                tryUseSavedLocation() {
+                    // Check if user has saved locations (passed from backend)
+                    @if(auth()->check() && $defaultLocation = auth()->user()->locations()->where('is_default', true)->first())
+                        this.latitude = {{ $defaultLocation->latitude }};
+                        this.longitude = {{ $defaultLocation->longitude }};
+                        this.savedLocationName = '{{ $defaultLocation->name }}';
+                        this.fetchZoneAnalysis().then(() => {
+                            this.status = 'saved';
+                        });
+                    @else
+                        this.status = 'denied';
+                    @endif
                 },
 
                 async refreshLocation() {
@@ -322,7 +376,8 @@
 
                     switch (error.code) {
                         case error.PERMISSION_DENIED:
-                            this.status = 'denied';
+                            // Try saved location as fallback
+                            this.tryUseSavedLocation();
                             break;
                         case error.POSITION_UNAVAILABLE:
                             this.status = 'error';

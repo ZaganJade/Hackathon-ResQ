@@ -36,7 +36,7 @@ class SecurityHeaders
                "img-src 'self' data: blob: storage: *.googleapis.com *.gstatic.com *.google.com *.openstreetmap.org *.tile.openstreetmap.org *.cartocdn.com images.unsplash.com images.unsplash.com *.unsplash.com; " .
                "font-src 'self' fonts.gstatic.com fonts.bunny.net cdnjs.cloudflare.com; " .
                "connect-src 'self' *.fireworks.ai *.googleapis.com *.wablas.com *.yobase.io *.yobase.me nominatim.openstreetmap.org unpkg.com cdnjs.cloudflare.com; " .
-               "frame-src 'self' *.youtube.com *.youtu.be *.youtube-nocookie.com; " .
+               "frame-src 'self' *.youtube.com *.youtu.be *.youtube-nocookie.com *.openstreetmap.org; " .
                "object-src 'none'; " .
                "base-uri 'self'; " .
                "form-action 'self';";

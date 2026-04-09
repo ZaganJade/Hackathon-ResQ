@@ -28,7 +28,7 @@ class AIAssistService
     {
         $this->fireworks = $fireworks ?? app(FireworksService::class);
         $this->locationRisk = $locationRisk ?? app(LocationRiskService::class);
-        $this->systemPrompt = config('resq.ai_system_prompt', 'Anda adalah asisten AI ResQ yang membantu masyarakat Indonesia dengan informasi mitigasi bencana.');
+        $this->systemPrompt = config('resq.ai_system_prompt', 'Kamu adalah ResQ, asisten mitigasi bencana. Gaya bicara santai kayak teman chat WhatsApp, JANGAN pakai **bintang** atau bullet point. Langsung ke inti aja.');
         $this->maxContextMessages = 10; // Keep last 10 messages for context
     }
 
@@ -212,73 +212,77 @@ class AIAssistService
         $warningMessage = $zoneAnalysis['warning_message'] ?? '';
         $recommendations = $zoneAnalysis['recommendations'] ?? [];
 
-        $locationContext = "\n\n=== KONTEKS LOKASI USER ===\n";
-        $locationContext .= "Status Zona Saat Ini: {$statusLabel}\n";
+        $locationContext = "\n\n=== INFO LOKASI USER ===\n";
+        $locationContext .= "Status zona sekarang: {$statusLabel}. ";
         $locationContext .= "Peringatan: {$warningMessage}\n";
-        $locationContext .= "Total Bencana di Sekitar (50km): {$zoneAnalysis['metrics']['total_nearby_disasters']}\n";
-        $locationContext .= "Cluster Maksimum (bencana berdekatan waktu): {$zoneAnalysis['metrics']['max_cluster_size']}\n";
-        $locationContext .= "Trend Risiko: {$riskTrend['trend']}\n";
+        $locationContext .= "Ada {$zoneAnalysis['metrics']['total_nearby_disasters']} bencana dalam radius 50km. ";
+        $locationContext .= "Cluster bencana terbesar: {$zoneAnalysis['metrics']['max_cluster_size']} kejadian. ";
+        $locationContext .= "Trend risiko: {$riskTrend['trend']}\n";
 
         if (!empty($zoneAnalysis['disasters_by_type'])) {
-            $locationContext .= "Tipe Bencana di Area:\n";
+            $locationContext .= "Jenis bencana yang pernah terjadi di sini: ";
+            $disasterList = [];
             foreach ($zoneAnalysis['disasters_by_type'] as $type => $count) {
-                $locationContext .= "- {$type}: {$count}\n";
+                $disasterList[] = "{$type} ({$count}x)";
             }
+            $locationContext .= implode(', ', $disasterList) . ".\n";
         }
 
         if (!empty($recommendations)) {
-            $locationContext .= "\nRekomendasi untuk User:\n";
+            $locationContext .= "\nSaran yang bisa diberikan ke user:\n";
             foreach (array_slice($recommendations, 0, 3) as $rec) {
                 $locationContext .= "- {$rec}\n";
             }
         }
 
-        $locationContext .= "\n=== INSTRUKSI KHUSUS ===\n";
+        $locationContext .= "\n=== INSTRUKSI KONTEKS LOKASI ===\n";
 
-        // Add status-specific instructions
+        // Add status-specific instructions (casual tone)
         switch ($status) {
             case LocationRiskService::STATUS_DANGER:
-                $locationContext .= "USER BERADA DI ZONA BERBAHAYA. Prioritaskan informasi evakuasi dan keselamatan. ";
-                $locationContext .= "Berikan peringatan tegas dan instruksi yang jelas. ";
-                $locationContext .= "Jika user bertanya hal tidak penting, arahkan kembali ke keselamatan.\n";
+                $locationContext .= "User lagi di zona berbahaya. Ini prioritas utama - info evakuasi dan keselamatan harus jadi fokus. ";
+                $locationContext .= "Kasih peringatan yang tegas tapi tetap nenangin, instruksinya jelas dan praktis. ";
+                $locationContext .= "Kalau user nanya hal yang nggak penting, arahin balik ke keselamatan.\n";
                 break;
             case LocationRiskService::STATUS_WARNING:
-                $locationContext .= "USER DI ZONA WASPADA. Berikan informasi kesiapsiagaan dan pantauan. ";
-                $locationContext .= "Bantu user memahami risiko dan langkah pencegahan.\n";
+                $locationContext .= "User di zona waspada. Bantu mereka siap-siap dan tetap waspada ya. ";
+                $locationContext .= "Jelasin risiko dan langkah pencegahan yang bisa mereka lakuin sekarang.\n";
                 break;
             case LocationRiskService::STATUS_SAFE:
-                $locationContext .= "USER DI ZONA AMAN. Tetap berikan edukasi mitigasi bencana. ";
-                $locationContext .= "Bantu user memahami potensi risiko dan kesiapsiagaan umum.\n";
+                $locationContext .= "User di zona aman, tapi tetap kasih edukasi mitigasi biar mereka ready kalau ada apa-apa. ";
+                $locationContext .= "Bantu mereka paham risiko di sekitar dan cara siap-siap secara umum.\n";
                 break;
         }
 
         // Add disaster type prioritization
         if (!empty($zoneAnalysis['disasters_by_type'])) {
             $topDisasterTypes = array_slice(array_keys($zoneAnalysis['disasters_by_type']), 0, 3);
-            $locationContext .= "\n=== PRIORITAS MITIGASI ===\n";
-            $locationContext .= "Berdasarkan data historis, bencana yang SERING TERJADI di area ini adalah: ";
-            $locationContext .= implode(', ', $topDisasterTypes) . ".\n";
-            $locationContext .= "ANDA WAJIB memprioritaskan mitigasi dan persiapan untuk bencana-bencana tersebut.\n";
-            $locationContext .= "Setiap jawaban Anda harus mempertimbangkan risiko spesifik dari tipe bencana di atas.\n";
+            $locationContext .= "\n=== INFO BENCANA DI AREA USER ===\n";
+            $locationContext .= "Berdasarkan data, bencana yang sering kejadian di sini: ";
+            $locationContext .= implode(', ', $topDisasterTypes) . ". ";
+            $locationContext .= "Tiap jawabanmu harus pertimbangin risiko spesifik dari bencana-bencana ini ya.\n";
 
             // Add specific guidance based on top disaster types
             foreach ($topDisasterTypes as $type) {
                 $mitigationFocus = match($type) {
-                    'earthquake' => 'fokus pada evakuasi saat gempa, titik aman (bawah meja), dan periksa struktur bangunan',
-                    'flood' => 'fokus pada aman dokumen, barang berharga di tempat tinggi, dan jalur evakuasi ke daratan tinggi',
-                    'tsunami' => 'fokus pada rute evakuasi ke daratan tinggi dan tanda peringatan tsunami',
-                    'volcanic_eruption' => 'fokus pada masker N95, perlindungan pernapasan, dan barang cadangan untuk isolasi',
-                    'landslide' => 'fokus pada tanda pergerakan tanah dan hindari area lereng saat hujan deras',
-                    'fire' => 'fokus pada jalur keluar darurat, pemadam api ringan, dan tidak menggunakan lift saat kebakaran',
-                    default => "fokus pada persiapan mitigasi khusus {$type}",
+                    'earthquake' => 'fokus ke evakuasi saat gempa, titik aman di bawah meja, dan cek struktur bangunan',
+                    'flood' => 'fokus ke amanin dokumen dan barang berharga di tempat tinggi, sama jalur evakuasi ke daratan tinggi',
+                    'tsunami' => 'fokus ke rute evakuasi ke daratan tinggi dan kenali tanda peringatan tsunami',
+                    'volcanic_eruption' => 'fokus ke masker N95, lindungin pernapasan, dan siapin barang cadangan buat isolasi',
+                    'landslide' => 'fokus ke kenali tanda pergerakan tanah dan hindari area lereng saat hujan deras',
+                    'fire' => 'fokus ke jalur keluar darurat, alat pemadam api ringan, dan jangan pake lift saat kebakaran',
+                    default => "fokus ke persiapan mitigasi khusus {$type}",
                 };
-                $locationContext .= "- Untuk {$type}: {$mitigationFocus}\n";
+                $locationContext .= "Untuk {$type}: {$mitigationFocus}. ";
             }
         }
 
-        $locationContext .= "\nSelalu sebutkan status zona saat ini dalam respons Anda.";
-        $locationContext .= " Berikan saran yang relevan dengan tipe bencana di area tersebut.";
-        $locationContext .= " Gunakan bahasa yang tenang tapi jelas.";
+        $locationContext .= "\n\n=== GAYA JAWABAN ===\n";
+        $locationContext .= "Sebutin status zona user dalam jawaban. ";
+        $locationContext .= "Kasih saran relevan sama bencana di area mereka. ";
+        $locationContext .= "Bahasanya santai kayak chat WhatsApp, JANGAN pakai **bintang** buat tebal, JANGAN pakai 1. 2. 3. buat nomor. ";
+        $locationContext .= "Kalau mau nyebut penting, cukup KAPITALIN aja. ";
+        $locationContext .= "Langsung ke inti, nggak usah banyak formalitas.";
 
         return $basePrompt . $locationContext;
     }

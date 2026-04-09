@@ -67,6 +67,7 @@
                             ['route' => 'articles.index', 'label' => 'Berita & Info', 'icon' => 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z', 'active' => 'articles.*'],
                             ['route' => 'chat-history.index', 'label' => 'Riwayat Chat', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'active' => 'chat-history.*'],
                             ['route' => 'ai-assist.index', 'label' => 'AI Assistant', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'active' => 'ai-assist.*'],
+                            ['route' => 'locations.index', 'label' => 'Lokasi Tersimpan', 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'active' => 'locations.*'],
                             ['route' => 'profile.edit', 'label' => 'Profil', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', 'active' => 'profile.*'],
                         ];
                     @endphp
@@ -90,27 +91,29 @@
                 {{-- User section with Dropdown (Click to Logout) --}}
                 <div class="px-3 mt-auto relative" x-data="{ userMenuOpen: false }">
                     {{-- Popup Menu (Appears upwards) --}}
-                    <div x-show="userMenuOpen" 
+                    <div x-show="userMenuOpen"
                          @click.away="userMenuOpen = false"
                          x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                          x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 translate-y-2"
-                         class="absolute left-0 w-full px-3 z-[100]"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                         class="absolute left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1"
                          style="bottom: 100%; margin-bottom: 8px; display: none;">
-                        <div class="bg-slate-800 border border-slate-700/50 rounded-xl shadow-lg ring-1 ring-black/5 overflow-hidden py-1 relative z-[101]">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-rose-400 hover:bg-slate-700/50 hover:text-rose-300 transition-all text-left font-medium">
-                                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                    <span class="whitespace-nowrap transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">Keluar (Logout)</span>
-                                </button>
-                            </form>
-                        </div>
+
+                        <a href="{{ route('profile.edit') }}" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            Edit Profil
+                        </a>
+
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
+                        </form>
                     </div>
 
                     {{-- User Profile Button --}}
@@ -503,37 +506,38 @@
                         </div>
 
                         <div class="relative bg-white/[0.04] border border-white/[0.06] rounded-2xl shadow-card overflow-hidden"
-                            style="min-height: 180px;">
+                            style="min-height: 220px;">
                             <template x-for="(tip, index) in tips" :key="index">
-                                <div x-show="currentTip === index" x-transition:enter="transition ease-out duration-500"
+                                <div x-show="currentTip === index" 
+                                    x-transition:enter="transition ease-out duration-500"
                                     x-transition:enter-start="opacity-0 translate-x-8"
                                     x-transition:enter-end="opacity-100 translate-x-0"
                                     x-transition:leave="transition ease-in duration-300"
                                     x-transition:leave-start="opacity-100 translate-x-0"
-                                    x-transition:leave-end="opacity-0 -translate-x-8" class="p-6 sm:p-8">
+                                    x-transition:leave-end="opacity-0 -translate-x-8" 
+                                    class="absolute inset-0 p-6 sm:p-8 pb-14 flex flex-col">
                                     <div class="flex items-start gap-4">
                                         <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl"
                                             :class="tip.bgColor">
                                             <span x-text="tip.icon"></span>
                                         </div>
                                         <div>
-                                            <h3 class="font-bold text-white text-base sm:text-lg" x-text="tip.title">
-                                            </h3>
-                                            <p class="text-sm text-slate-400 mt-2 leading-relaxed" x-text="tip.desc">
-                                            </p>
+                                            <h3 class="font-bold text-white text-base sm:text-lg" x-text="tip.title"></h3>
+                                            <p class="text-sm text-slate-400 mt-2 leading-relaxed" x-text="tip.desc"></p>
                                         </div>
-                                    </div>
-                                    {{-- Progress dots --}}
-                                    <div class="flex gap-1.5 mt-6 justify-center">
-                                        <template x-for="(_, i) in tips" :key="'dot-' + i">
-                                            <button @click="currentTip = i"
-                                                class="h-1.5 rounded-full transition-all duration-300"
-                                                :class="currentTip === i ? 'w-6 bg-emerald-500' : 'w-1.5 bg-slate-600 hover:bg-slate-500'">
-                                            </button>
-                                        </template>
                                     </div>
                                 </div>
                             </template>
+
+                            {{-- Progress dots (moved outside so they don't duplicate during transition) --}}
+                            <div class="absolute bottom-6 left-0 right-0 flex gap-1.5 justify-center z-10">
+                                <template x-for="(_, i) in tips" :key="'dot-' + i">
+                                    <button @click="currentTip = i"
+                                        class="h-1.5 rounded-full transition-all duration-300"
+                                        :class="currentTip === i ? 'w-6 bg-emerald-500' : 'w-1.5 bg-slate-600 hover:bg-slate-500'">
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                     </section>
 
@@ -807,6 +811,13 @@
                 get alertLabel() {
                     const labels = { aman: 'Aman (Hijau)', waspada: 'Waspada (Kuning)', darurat: 'Darurat (Merah)' };
                     return labels[this.alertLevel] || 'Aman (Hijau)';
+                },
+
+                // Stats for disaster monitoring
+                stats: {
+                    totalDisasters: 0,
+                    highRisk: 0,
+                    safeZones: 0
                 },
 
                 // Tips carousel

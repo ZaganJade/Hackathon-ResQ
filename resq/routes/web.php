@@ -7,6 +7,7 @@ use App\Http\Controllers\ChatHistoryController;
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserLocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -51,6 +52,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/guides', [GuideController::class, 'index'])->name('guides.index');
     Route::get('/guides/category/{category}', [GuideController::class, 'category'])->name('guides.category');
     Route::get('/guides/{slug}', [GuideController::class, 'show'])->name('guides.show');
+
+    // User Locations Routes
+    Route::get('/locations', [UserLocationController::class, 'index'])->name('locations.index');
+    Route::get('/locations/create', [UserLocationController::class, 'create'])->name('locations.create');
+    Route::post('/locations', [UserLocationController::class, 'store'])->name('locations.store');
+    Route::get('/locations/{location}/edit', [UserLocationController::class, 'edit'])->name('locations.edit');
+    Route::patch('/locations/{location}', [UserLocationController::class, 'update'])->name('locations.update');
+    Route::delete('/locations/{location}', [UserLocationController::class, 'destroy'])->name('locations.destroy');
+    Route::post('/locations/{location}/default', [UserLocationController::class, 'setDefault'])->name('locations.set-default');
+    Route::post('/locations/reverse-geocode', [UserLocationController::class, 'reverseGeocode'])->name('locations.reverse-geocode');
+    Route::get('/user/location', [UserLocationController::class, 'getCurrentLocation'])->name('user.location.get');
 });
 
 // Map API Routes (public)
