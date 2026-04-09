@@ -91,7 +91,7 @@
             {{-- Hero Header --}}
             <div class="relative overflow-hidden glass-dark border-b border-white/5 pb-12">
                 <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div class="absolute -top-16 -left-16 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-16 -left-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
                     <div class="absolute -bottom-24 right-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
                 </div>
 
@@ -110,7 +110,7 @@
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-4 relative z-10">
                     <div class="text-center" data-aos="fade-up" data-aos-delay="200">
                         @if($article->category ?? false)
-                            <a href="{{ route('articles.category', $article->category) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-5 hover:shadow-[0_0_20px_rgba(56,189,248,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
+                            <a href="{{ route('articles.category', $article->category) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-5 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
                                 <span class="capitalize">{{ ucfirst($article->category) }}</span>
                             </a>
                         @endif
@@ -130,8 +130,8 @@
                                 </div>
                             </div>
                             <span class="hidden sm:block w-px h-6 bg-white/10"></span>
-                            <span class="flex items-center gap-1.5 text-slate-400">
-                                <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                             <span class="flex items-center gap-1.5 text-slate-400">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 {{ ($article->published_at ?? now())->format('d M Y') }}
                             </span>
                             <span class="hidden sm:block w-px h-6 bg-white/10"></span>
@@ -156,7 +156,7 @@
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-10 relative z-20" data-aos="zoom-in" data-aos-delay="300">
                     <div class="h-48 md:h-64 bg-slate-800/50 rounded-2xl shadow-2xl border border-white/10 flex items-center justify-center relative overflow-hidden">
                         <svg class="w-16 h-16 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                        <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
                         <div class="absolute -top-8 -left-8 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl"></div>
                     </div>
                 </div>
@@ -200,9 +200,9 @@
                         {{-- Related Articles --}}
                         @if(($relatedArticles ?? collect())->count() > 0)
                             <div data-aos="fade-up">
-                                <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center border border-sky-500/20">
-                                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                 <h3 class="text-lg font-bold text-white mb-5 flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
                                     Artikel Terkait
                                 </h3>

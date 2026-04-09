@@ -91,14 +91,14 @@
             {{-- HERO HEADER --}}
             <section class="relative overflow-hidden glass-dark border-b border-white/5" data-aos="fade-down" data-aos-duration="1000">
                 <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
                     <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
                 </div>
 
                 <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6 sm:pt-8 sm:pb-8">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex items-center gap-4" data-aos="fade-right" data-aos-delay="200">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
                                 </svg>
@@ -186,7 +186,7 @@
                                         @else
                                             <div class="h-36 bg-slate-800/50 relative flex items-center justify-center overflow-hidden border-b border-white/5">
                                                 <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                                                <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-sky-500/10 rounded-full blur-xl"></div>
+                                                <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                                                 @if($article->category)
                                                     <span class="absolute top-3 left-3 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold text-white border border-white/20">{{ ucfirst($article->category) }}</span>
                                                 @endif
@@ -234,7 +234,7 @@
                             {{-- Sample Articles --}}
                             @php
                                 $sampleArticles = [
-                                    ['title' => 'Cara Menyusun Rencana Evakuasi Keluarga yang Efektif', 'excerpt' => 'Rencana evakuasi yang baik dapat menyelamatkan nyawa saat bencana terjadi.', 'category' => 'Kesiapsiagaan', 'gradient' => 'from-sky-500/20 to-blue-500/10'],
+                                    ['title' => 'Cara Menyusun Rencana Evakuasi Keluarga yang Efektif', 'excerpt' => 'Rencana evakuasi yang baik dapat menyelamatkan nyawa saat bencana terjadi.', 'category' => 'Kesiapsiagaan', 'gradient' => 'from-emerald-500/20 to-green-500/10'],
                                     ['title' => 'Mengenal Tanda-Tanda Gempa Bumi dan Tindakan Pertama', 'excerpt' => 'Memahami tanda-tanda awal gempa bumi sangat penting untuk keselamatan.', 'category' => 'Respons Darurat', 'gradient' => 'from-amber-500/20 to-orange-500/10'],
                                     ['title' => 'Persiapan Pasca Bencana: Memulihkan Kehidupan', 'excerpt' => 'Proses pemulihan pasca bencana membutuhkan perencanaan matang.', 'category' => 'Pemulihan', 'gradient' => 'from-emerald-500/20 to-green-500/10'],
                                     ['title' => 'Teknologi Modern dalam Mitigasi Bencana', 'excerpt' => 'Dari sistem peringatan dini hingga aplikasi darurat.', 'category' => 'Mitigasi', 'gradient' => 'from-purple-500/20 to-indigo-500/10'],
@@ -281,8 +281,8 @@
                         @if(($popularArticles ?? collect())->count() > 0)
                             <div class="glass-dark rounded-2xl border border-white/5 shadow-soft p-5" data-aos="fade-left" data-aos-delay="300">
                                 <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
                                     </div>
                                     Populer
                                 </h3>
@@ -305,7 +305,7 @@
                         {{-- Newsletter Card --}}
                         <div class="bg-gradient-to-br from-emerald-900/40 to-slate-800/40 rounded-2xl border border-emerald-500/20 shadow-lg p-5 text-white overflow-hidden relative" data-aos="fade-left" data-aos-delay="400">
                             <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                            <div class="absolute -top-10 -left-10 w-24 h-24 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <div class="absolute -top-10 -left-10 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
                             <div class="relative z-10">
                                 <h3 class="text-base font-bold mb-2">Tetap Terinformasi</h3>
                                 <p class="text-sm text-slate-400 mb-4 leading-relaxed">

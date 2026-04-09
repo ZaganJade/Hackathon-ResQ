@@ -1,13 +1,13 @@
 <x-app-layout>
-    {{-- Chat Detail — Fluid Modern Dashboard Style --}}
-    <div class="min-h-screen bg-gradient-to-b from-green-50/60 via-white to-slate-50 pb-24 lg:pb-8" x-data="{}" x-cloak>
+    {{-- Chat Detail — Premium Dark Dashboard Style --}}
+    <div class="min-h-screen bg-slate-950 pb-24 lg:pb-8" x-data="{}" x-cloak>
 
         {{-- DESKTOP SIDEBAR --}}
         <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col"
                x-data="{ sidebarHover: false }" @mouseenter="sidebarHover = true" @mouseleave="sidebarHover = false">
             <div class="h-full bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 shadow-soft-lg flex flex-col py-6 sidebar-spring overflow-hidden" :class="sidebarHover ? 'w-64' : 'w-[72px]'">
                 <div class="flex items-center gap-3 px-4 mb-8 overflow-hidden">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-emerald-400 flex items-center justify-center shrink-0 shadow-md">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-400 flex items-center justify-center shrink-0 shadow-md">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <span class="font-bold text-xl text-white whitespace-nowrap transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">ResQ</span>
@@ -23,7 +23,7 @@
                         ['route'=>'profile.edit','label'=>'Profil','icon'=>'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z','active'=>'profile.*'],
                     ]; @endphp
                     @foreach($menuItems as $item)
-                        <a href="{{ route($item['route']) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group whitespace-nowrap {{ request()->routeIs($item['active']) ? 'menu-active' : 'text-slate-400 hover:bg-white/5 hover:text-emerald-400' }}">
+                        <a href="{{ route($item['route']) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group whitespace-nowrap {{ request()->routeIs($item['active']) ? 'bg-emerald-500/10 text-emerald-400' : 'text-slate-400 hover:bg-white/5 hover:text-emerald-400' }}">
                             <div class="w-7 h-7 flex items-center justify-center shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}"></path></svg></div>
                             <span class="text-sm font-medium transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">{{ $item['label'] }}</span>
                         </a>
@@ -39,23 +39,11 @@
                             <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
                     </button>
-                    
-                    {{-- Dropdown Menu --}}
-                    <div x-show="openOptions" 
-                         x-transition:enter="transition ease-out duration-200" 
-                         x-transition:enter-start="opacity-0 translate-y-1 scale-95" 
-                         x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
-                         x-transition:leave="transition ease-in duration-150" 
-                         x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
-                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-                         class="absolute  left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1"
-                         style="bottom: 100%; margin-bottom: 8px; display: none;">
-                        
+                    <div x-show="openOptions" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-1 scale-95" class="absolute left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1" style="bottom: 100%; margin-bottom: 8px; display: none;">
                         <a href="{{ route('profile.edit') }}" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                             Edit Profil
                         </a>
-                        
                         <form method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
                             <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center gap-2">
@@ -70,22 +58,22 @@
 
         <div class="lg:ml-[72px]">
             {{-- Top Bar --}}
-            <div class="bg-white/80 backdrop-blur-xl border-b border-slate-100/80 shadow-sm animate-fade-up">
+            <div class="glass-dark border-b border-white/5 shadow-soft animate-fade-up">
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0">
-                            <a href="{{ route('chat-history.index') }}" class="p-2 rounded-xl text-slate-400 hover:text-primary-600 hover:bg-white/5 transition-all duration-200 flex-shrink-0">
+                            <a href="{{ route('chat-history.index') }}" class="p-2 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-white/5 transition-all duration-200 flex-shrink-0">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                             </a>
                             <div class="min-w-0">
-                                <h1 class="text-base sm:text-lg font-bold text-slate-800 truncate">{{ $title }}</h1>
-                                <p class="text-xs text-slate-400">{{ $metadata['started_at']?->format('d M Y H:i') }} · {{ $metadata['total_messages'] }} pesan</p>
+                                <h1 class="text-base sm:text-lg font-bold text-white truncate">{{ $title }}</h1>
+                                <p class="text-xs text-slate-500">{{ $metadata['started_at']?->format('d M Y H:i') }} · {{ $metadata['total_messages'] }} pesan</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
-                            <button onclick="exportConversation('json')" class="p-2 rounded-xl text-slate-400 hover:text-primary-600 hover:bg-white/5 transition-all duration-200" title="Export JSON"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></button>
-                            <button onclick="exportConversation('text')" class="p-2 rounded-xl text-slate-400 hover:text-primary-600 hover:bg-white/5 transition-all duration-200" title="Export Text"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></button>
-                            <button onclick="deleteConversation('{{ $conversationId }}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all duration-200" title="Hapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+                            <button onclick="exportConversation('json')" class="p-2 rounded-xl text-slate-500 hover:text-emerald-400 hover:bg-white/5 transition-all duration-200" title="Export JSON"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></button>
+                            <button onclick="exportConversation('text')" class="p-2 rounded-xl text-slate-500 hover:text-emerald-400 hover:bg-white/5 transition-all duration-200" title="Export Text"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></button>
+                            <button onclick="deleteConversation('{{ $conversationId }}')" class="p-2 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200" title="Hapus"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
                         </div>
                     </div>
                 </div>
@@ -95,16 +83,16 @@
                 {{-- Stats --}}
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 animate-fade-up stagger-2">
                     @php $metaCards = [
-                        ['l'=>'Total Pesan','v'=>$metadata['total_messages'],'i'=>'💬'],
-                        ['l'=>'Pesan Anda','v'=>$metadata['user_messages'],'i'=>'👤'],
-                        ['l'=>'Respons AI','v'=>$metadata['ai_messages'],'i'=>'🤖'],
-                        ['l'=>'Waktu Respons','v'=>$metadata['avg_response_time'] ? number_format($metadata['avg_response_time'],2).'s' : '-','i'=>'⚡'],
+                        ['l'=>'Total Pesan','v'=>$metadata['total_messages'],'i'=>'💬', 'b' => 'border-sky-500/20', 't' => 'text-sky-400'],
+                        ['l'=>'Pesan Anda','v'=>$metadata['user_messages'],'i'=>'👤', 'b' => 'border-emerald-500/20', 't' => 'text-emerald-400'],
+                        ['l'=>'Respons AI','v'=>$metadata['ai_messages'],'i'=>'🤖', 'b' => 'border-amber-500/20', 't' => 'text-amber-400'],
+                        ['l'=>'Waktu Respons','v'=>$metadata['avg_response_time'] ? number_format($metadata['avg_response_time'],2).'s' : '-','i'=>'⚡', 'b' => 'border-green-500/20', 't' => 'text-green-400'],
                     ]; @endphp
                     @foreach($metaCards as $m)
-                        <div class="bg-white rounded-2xl shadow-card p-4 text-center">
+                        <div class="glass-dark rounded-2xl border {{ $m['b'] }} shadow-soft p-4 text-center">
                             <span class="text-xl">{{ $m['i'] }}</span>
-                            <p class="text-lg font-bold text-slate-800 mt-1">{{ $m['v'] }}</p>
-                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{{ $m['l'] }}</p>
+                            <p class="text-lg font-bold {{ $m['t'] }} mt-1">{{ $m['v'] }}</p>
+                            <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{{ $m['l'] }}</p>
                         </div>
                     @endforeach
                 </div>
@@ -119,24 +107,24 @@
                                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     </div>
                                 @else
-                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-primary-500 flex items-center justify-center shadow-md">
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
                                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                     </div>
                                 @endif
                             </div>
-                            <div class="flex-1 {{ $message->role === 'user' ? 'bg-gradient-to-br from-primary-50 to-emerald-50 border-primary-100/40 rounded-2xl rounded-tr-md' : 'bg-white border-slate-100/60 rounded-2xl rounded-tl-md' }} p-4 shadow-card border">
+                            <div class="flex-1 {{ $message->role === 'user' ? 'bg-emerald-500/10 border-emerald-500/20 rounded-2xl rounded-tr-md' : 'glass-dark border-white/5 rounded-2xl rounded-tl-md' }} p-4 shadow-soft border">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-xs font-bold {{ $message->role === 'user' ? 'text-primary-700' : 'text-violet-600' }}">{{ $message->role === 'user' ? 'Anda' : 'AI ResQ' }}</span>
+                                    <span class="text-xs font-bold {{ $message->role === 'user' ? 'text-emerald-400' : 'text-emerald-400' }}">{{ $message->role === 'user' ? 'Anda' : 'AI ResQ' }}</span>
                                     <div class="flex items-center gap-2">
                                         @if($message->role !== 'user' && isset($message->metadata['response_time']))
-                                            <span class="text-[10px] text-slate-300">⚡{{ $message->metadata['response_time'] }}s</span>
+                                            <span class="text-[10px] text-emerald-500/60">⚡{{ $message->metadata['response_time'] }}s</span>
                                         @endif
-                                        <span class="text-[10px] text-slate-300">{{ $message->created_at->format('H:i, d M') }}</span>
+                                        <span class="text-[10px] text-slate-500">{{ $message->created_at->format('H:i, d M') }}</span>
                                     </div>
                                 </div>
-                                <div class="text-sm text-slate-700 prose prose-sm max-w-none leading-relaxed">{!! nl2br(e($message->message)) !!}</div>
+                                <div class="text-sm text-slate-300 prose prose-sm max-w-none leading-relaxed">{!! nl2br(e($message->message)) !!}</div>
                                 @if($message->role !== 'user' && isset($message->metadata['model']))
-                                    <div class="mt-2 text-[10px] text-slate-300 font-mono">{{ $message->metadata['model'] }}</div>
+                                    <div class="mt-2 text-[10px] text-slate-600 font-mono">{{ $message->metadata['model'] }}</div>
                                 @endif
                             </div>
                         </div>
@@ -145,7 +133,7 @@
 
                 {{-- Continue Button --}}
                 <div class="text-center animate-fade-up stagger-5">
-                    <a href="{{ route('ai-assist.index') }}?conversation={{ $conversationId }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-primary-500 text-white rounded-full text-sm font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] shadow-md">
+                    <a href="{{ route('ai-assist.index') }}?conversation={{ $conversationId }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-sm font-semibold hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] shadow-md">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         Lanjutkan Percakapan
                     </a>
@@ -155,13 +143,13 @@
     </div>
 
     {{-- Delete Modal --}}
-    <div id="deleteModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-soft-lg">
-            <div class="w-14 h-14 mx-auto mb-4 bg-rose-100 rounded-2xl flex items-center justify-center"><span class="text-2xl">🗑️</span></div>
-            <h3 class="text-lg font-bold text-slate-800 text-center mb-2">Konfirmasi Hapus</h3>
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="glass-dark rounded-2xl p-6 max-w-sm w-full mx-4 border border-white/10 shadow-2xl">
+            <div class="w-14 h-14 mx-auto mb-4 bg-rose-500/10 rounded-2xl flex items-center justify-center border border-rose-500/20"><span class="text-2xl">🗑️</span></div>
+            <h3 class="text-lg font-bold text-white text-center mb-2">Konfirmasi Hapus</h3>
             <p class="text-sm text-slate-400 text-center mb-6">Tindakan ini tidak dapat dibatalkan.</p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium hover:bg-slate-200 transition-colors">Batal</button>
+                <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 glass border border-white/10 text-slate-300 rounded-xl font-medium hover:bg-white/10 transition-colors">Batal</button>
                 <button id="confirmDeleteBtn" class="flex-1 px-4 py-2.5 bg-rose-500 text-white rounded-xl font-medium hover:bg-rose-600 transition-colors">Hapus</button>
             </div>
         </div>
@@ -184,5 +172,12 @@
         document.getElementById('deleteModal').addEventListener('click', function(e) { if(e.target===this) closeDeleteModal(); });
     </script>
     @endpush
-    <style>[x-cloak]{display:none!important}</style>
+    <style>
+        [x-cloak]{display:none!important}
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
 </x-app-layout>
