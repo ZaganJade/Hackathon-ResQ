@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LocationRiskController;
 use App\Http\Controllers\Webhook\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,30 @@ Route::prefix('v1/webhook')->group(function () {
             ->name('api.webhook.whatsapp.status');
     });
 
+});
+
+// Location-based Risk Analysis API
+Route::prefix('v1/location')->group(function () {
+
+    // Quick zone status check (GET)
+    Route::get('/status', [LocationRiskController::class, 'quickStatus'])
+        ->name('api.location.status');
+
+    // Full zone analysis (POST)
+    Route::post('/analyze', [LocationRiskController::class, 'analyze'])
+        ->name('api.location.analyze');
+
+    // Get nearby disasters (GET)
+    Route::get('/nearby-disasters', [LocationRiskController::class, 'nearbyDisasters'])
+        ->name('api.location.nearby');
+
+    // Reverse geocode coordinates (GET)
+    Route::get('/reverse-geocode', [LocationRiskController::class, 'reverseGeocode'])
+        ->name('api.location.geocode');
+
+    // Location-aware chat with AI (POST - requires auth)
+    Route::middleware(['auth:sanctum'])->post('/chat', [LocationRiskController::class, 'chat'])
+        ->name('api.location.chat');
 });
 
 // Health check endpoint (no auth required)

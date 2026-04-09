@@ -1,13 +1,17 @@
 <x-app-layout>
-    {{-- Profil — Fluid Modern Dashboard Style --}}
-    <div class="min-h-screen bg-gradient-to-b from-green-50/60 via-white to-slate-50 pb-24 lg:pb-8" x-data="{}" x-cloak>
+    @push('styles')
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    @endpush
+
+    {{-- Profil — Modern Dark Dashboard Style (Matching Edukasi) --}}
+    <div class="min-h-screen bg-slate-950 pb-24 lg:pb-8" x-data="{}" x-cloak>
 
         {{-- DESKTOP SIDEBAR --}}
         <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col"
                x-data="{ sidebarHover: false }" @mouseenter="sidebarHover = true" @mouseleave="sidebarHover = false">
             <div class="h-full bg-slate-900/95 backdrop-blur-2xl border-r border-white/5 shadow-soft-lg flex flex-col py-6 sidebar-spring overflow-hidden" :class="sidebarHover ? 'w-64' : 'w-[72px]'">
                 <div class="flex items-center gap-3 px-4 mb-8 overflow-hidden">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-emerald-400 flex items-center justify-center shrink-0 shadow-md">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-400 flex items-center justify-center shrink-0 shadow-md">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <span class="font-bold text-xl text-white whitespace-nowrap transition-opacity duration-300" :class="sidebarHover ? 'opacity-100' : 'opacity-0'">ResQ</span>
@@ -39,23 +43,11 @@
                             <p class="text-xs text-slate-400 truncate">{{ Auth::user()->email }}</p>
                         </div>
                     </button>
-                    
-                    {{-- Dropdown Menu --}}
-                    <div x-show="openOptions" 
-                         x-transition:enter="transition ease-out duration-200" 
-                         x-transition:enter-start="opacity-0 translate-y-1 scale-95" 
-                         x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
-                         x-transition:leave="transition ease-in duration-150" 
-                         x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
-                         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-                         class="absolute  left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1"
-                         style="bottom: 100%; margin-bottom: 8px; display: none;">
-                        
+                    <div x-show="openOptions" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-1 scale-95" class="absolute left-1 right-1 w-auto mx-2 bg-slate-800 border border-white/10 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.5)] overflow-hidden z-[100] py-1" style="bottom: 100%; margin-bottom: 8px; display: none;">
                         <a href="{{ route('profile.edit') }}" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                             Edit Profil
                         </a>
-                        
                         <form method="POST" action="{{ route('logout') }}" class="m-0">
                             @csrf
                             <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors flex items-center gap-2">
@@ -70,68 +62,231 @@
 
         <div class="lg:ml-[72px]">
             {{-- Hero --}}
-            <section class="relative overflow-hidden bg-gradient-to-br from-emerald-50/80 via-green-50/40 to-white animate-fade-up">
-                <div class="absolute inset-0"><div class="absolute -top-16 -right-16 w-72 h-72 bg-emerald-200/10 rounded-full blur-3xl"></div></div>
+            <section class="relative overflow-hidden glass-dark border-b border-white/5" data-aos="fade-down" data-aos-duration="1000">
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-green-500/10 rounded-full blur-3xl"></div>
+                </div>
                 <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6 sm:pt-8 sm:pb-8">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-primary-500/20 ring-4 ring-white">
+                    <div class="flex items-center gap-4" data-aos="fade-right" data-aos-delay="200">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 ring-4 ring-white/10">
                             <span class="text-2xl font-bold text-white">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</span>
                         </div>
                         <div>
-                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800">{{ Auth::user()->name }}</h1>
-                            <p class="text-slate-500 text-sm mt-0.5">{{ Auth::user()->email }}</p>
+                            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-white">{{ Auth::user()->name }}</h1>
+                            <p class="text-slate-400 text-sm mt-0.5">{{ Auth::user()->email }}</p>
                         </div>
                     </div>
                 </div>
-                <div class="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-transparent to-white/80"></div>
             </section>
 
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
                 {{-- Profile Information --}}
-                <div class="bg-white rounded-2xl shadow-card p-6 sm:p-8 animate-fade-up stagger-2">
+                <div class="glass-dark rounded-2xl border border-white/5 shadow-soft p-6 sm:p-8" data-aos="fade-up" data-aos-delay="100">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center"><span class="text-sm">👤</span></div>
-                        <h2 class="text-lg font-bold text-slate-800">Informasi Profil</h2>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20"><span class="text-sm">👤</span></div>
+                        <h2 class="text-lg font-bold text-white">Informasi Profil</h2>
                     </div>
-                    <div class="max-w-xl">
+                    <div class="max-w-xl profile-dark-form">
                         @include('profile.partials.update-profile-information-form')
                     </div>
                 </div>
 
                 {{-- Password --}}
-                <div class="bg-white rounded-2xl shadow-card p-6 sm:p-8 animate-fade-up stagger-3">
+                <div class="glass-dark rounded-2xl border border-white/5 shadow-soft p-6 sm:p-8" data-aos="fade-up" data-aos-delay="200">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center"><span class="text-sm">🔑</span></div>
-                        <h2 class="text-lg font-bold text-slate-800">Ubah Password</h2>
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20"><span class="text-sm">🔑</span></div>
+                        <h2 class="text-lg font-bold text-white">Ubah Password</h2>
                     </div>
-                    <div class="max-w-xl">
+                    <div class="max-w-xl profile-dark-form">
                         @include('profile.partials.update-password-form')
                     </div>
                 </div>
 
                 {{-- Notification Settings --}}
-                <div class="bg-white rounded-2xl shadow-card p-6 sm:p-8 animate-fade-up stagger-4">
+                <div class="glass-dark rounded-2xl border border-white/5 shadow-soft p-6 sm:p-8" data-aos="fade-up" data-aos-delay="300">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center"><span class="text-sm">🔔</span></div>
-                        <h2 class="text-lg font-bold text-slate-800">Pengaturan Notifikasi</h2>
+                        <div class="w-9 h-9 rounded-xl bg-sky-500/10 flex items-center justify-center border border-sky-500/20"><span class="text-sm">🔔</span></div>
+                        <h2 class="text-lg font-bold text-white">Pengaturan Notifikasi</h2>
                     </div>
-                    <div class="max-w-xl">
+                    <div class="max-w-xl profile-dark-form">
                         @include('profile.partials.update-notification-settings-form')
                     </div>
                 </div>
 
                 {{-- Delete Account --}}
-                <div class="bg-white rounded-2xl shadow-card p-6 sm:p-8 border border-rose-100/50 animate-fade-up stagger-5">
+                <div class="glass-dark rounded-2xl border border-rose-500/20 shadow-soft p-6 sm:p-8" data-aos="fade-up" data-aos-delay="400">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center"><span class="text-sm">⚠️</span></div>
-                        <h2 class="text-lg font-bold text-slate-800">Hapus Akun</h2>
+                        <div class="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20"><span class="text-sm">⚠️</span></div>
+                        <h2 class="text-lg font-bold text-white">Hapus Akun</h2>
                     </div>
-                    <div class="max-w-xl">
+                    <div class="max-w-xl profile-dark-form">
                         @include('profile.partials.delete-user-form')
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <style>[x-cloak]{display:none!important}</style>
+
+    @push('scripts')
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ duration: 800, once: true, offset: 50 });
+        });
+    </script>
+    @endpush
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        /* Dark Theme Overrides for Profile Forms */
+        .profile-dark-form h2.text-lg.font-medium.text-gray-900,
+        .profile-dark-form h2 {
+            color: #f1f5f9 !important;
+        }
+        .profile-dark-form p.text-sm.text-gray-600,
+        .profile-dark-form .text-gray-600 {
+            color: #64748b !important;
+        }
+        .profile-dark-form .text-gray-900,
+        .profile-dark-form h3.text-sm.font-medium.text-gray-900 {
+            color: #e2e8f0 !important;
+        }
+        .profile-dark-form .text-gray-500 {
+            color: #64748b !important;
+        }
+        .profile-dark-form .text-gray-700 {
+            color: #94a3b8 !important;
+        }
+        .profile-dark-form .text-gray-800 {
+            color: #cbd5e1 !important;
+        }
+
+        /* Form Label Overrides */
+        .profile-dark-form label {
+            color: #cbd5e1 !important;
+        }
+
+        /* Input Overrides */
+        .profile-dark-form input[type="text"],
+        .profile-dark-form input[type="email"],
+        .profile-dark-form input[type="password"],
+        .profile-dark-form input[type="tel"],
+        .profile-dark-form select,
+        .profile-dark-form textarea {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #f1f5f9 !important;
+        }
+        .profile-dark-form input::placeholder,
+        .profile-dark-form textarea::placeholder {
+            color: #475569 !important;
+        }
+        .profile-dark-form input:focus,
+        .profile-dark-form select:focus,
+        .profile-dark-form textarea:focus {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            --tw-ring-color: rgba(16, 185, 129, 0.3) !important;
+        }
+
+        /* Checkbox Overrides */
+        .profile-dark-form input[type="checkbox"] {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+        .profile-dark-form input[type="checkbox"]:checked {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+
+        /* Toggle Overrides */
+        .profile-dark-form .bg-gray-200 {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        .profile-dark-form .peer-checked\\:bg-red-600 {
+            background-color: #10b981 !important;
+        }
+
+        /* Card-like containers */
+        .profile-dark-form .bg-gray-50,
+        .profile-dark-form .dark\\:bg-gray-800 {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+        }
+
+        /* Checkbox Labels in grid */
+        .profile-dark-form label.flex.items-center.p-3 {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            background-color: transparent !important;
+        }
+        .profile-dark-form label.flex.items-center.p-3:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        /* Info box */
+        .profile-dark-form .bg-blue-50,
+        .profile-dark-form .dark\\:bg-blue-900\\/20 {
+            background-color: rgba(56, 189, 248, 0.05) !important;
+            border-color: rgba(56, 189, 248, 0.15) !important;
+        }
+        .profile-dark-form .text-blue-600,
+        .profile-dark-form .dark\\:text-blue-400 {
+            color: #38bdf8 !important;
+        }
+        .profile-dark-form .text-blue-900,
+        .profile-dark-form .dark\\:text-blue-100 {
+            color: #e0f2fe !important;
+        }
+        .profile-dark-form .text-blue-700,
+        .profile-dark-form .dark\\:text-blue-300 {
+            color: #7dd3fc !important;
+        }
+
+        /* Select Dropdown */
+        .profile-dark-form select option {
+            background-color: #1e293b;
+            color: #f1f5f9;
+        }
+
+        /* Primary Button Overrides */
+        .profile-dark-form button[type="submit"]:not(.bg-red-600):not(.inline-flex),
+        .profile-dark-form .inline-flex.items-center.px-4.py-2.bg-gray-800 {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border: none !important;
+            color: white !important;
+            border-radius: 0.75rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+        .profile-dark-form button[type="submit"]:not(.bg-red-600):not(.inline-flex):hover {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important;
+            transform: scale(1.02) !important;
+        }
+
+        /* Danger Button */
+        .profile-dark-form .bg-red-600,
+        .profile-dark-form button.inline-flex.items-center.justify-center.px-4.py-2.bg-red-600 {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            border-radius: 0.75rem !important;
+        }
+
+        /* Secondary Button */
+        .profile-dark-form .bg-white.border.border-gray-300 {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #94a3b8 !important;
+            border-radius: 0.75rem !important;
+        }
+        .profile-dark-form .bg-white.border.border-gray-300:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Success message */
+        .profile-dark-form .text-green-600 {
+            color: #34d399 !important;
+        }
+    </style>
 </x-app-layout>

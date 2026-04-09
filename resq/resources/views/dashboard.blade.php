@@ -37,7 +37,14 @@
         </div>
 
         {{-- ============================================
-        2. DESKTOP SIDEBAR — Invisible → Visible
+        2. ZONE STATUS WIDGET — Location-based disaster alert
+        ============================================ --}}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <x-zone-status-widget />
+        </div>
+
+        {{-- ============================================
+        3. DESKTOP SIDEBAR — Invisible → Visible
         ============================================ --}}
         <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col" x-data="{ sidebarHover: false }"
             @mouseenter="sidebarHover = true" @mouseleave="sidebarHover = false">

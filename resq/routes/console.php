@@ -188,3 +188,13 @@ Schedule::call(function () {
     // Process pending WhatsApp messages every 5 minutes
     app(WhatsAppService::class)->processPendingMessages();
 })->everyFiveMinutes();
+
+// Location-based risk monitoring - check every 30 minutes and notify users
+Schedule::call(function () {
+    app(\App\Console\Commands\CheckLocationRiskCommand::class)->handle();
+})->everyThirtyMinutes();
+
+// Daily summary of location risks for all users with saved locations
+Schedule::call(function () {
+    \Illuminate\Support\Facades\Artisan::call('resq:check-location-risk', ['--notify' => true]);
+})->dailyAt('08:00');

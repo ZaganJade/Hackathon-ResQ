@@ -90,4 +90,20 @@ class User extends Authenticatable
     {
         return $this->is_admin;
     }
+
+    /**
+     * Get the saved locations for the user.
+     */
+    public function locations(): HasMany
+    {
+        return $this->hasMany(UserLocation::class);
+    }
+
+    /**
+     * Get the default location for the user.
+     */
+    public function defaultLocation(): HasOne
+    {
+        return $this->hasOne(UserLocation::class)->where('is_default', true);
+    }
 }

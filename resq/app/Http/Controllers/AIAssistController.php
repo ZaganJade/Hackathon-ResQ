@@ -26,27 +26,49 @@ class AIAssistController extends Controller
 
     /**
      * Handle chat message and return AI response.
+     * Supports optional location data for location-aware responses.
      */
     public function chat(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'message' => 'required|string|max:2000',
             'conversation_id' => 'nullable|string|max:50',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'error' => 'Pesan tidak valid. Maksimal 2000 karakter.',
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $user = auth()->user();
         $message = strip_tags($request->input('message'));
         $conversationId = $request->input('conversation_id');
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
 
         $startTime = microtime(true);
 
+        // Use location-aware chat if coordinates provided
+        if ($lat !== null && $lng !== null) {
+            $result = $this->aiService->chatWithLocation($message, $user->id, $lat, $lng, $conversationId);
+
+            $endTime = microtime(true);
+
+            return response()->json([
+                'success' => $result['success'],
+                'reply' => $result['reply'],
+                'conversation_id' => $result['conversation_id'],
+                'response_time' => $result['response_time'] ?? round($endTime - $startTime, 3),
+                'location_context' => $result['location_context'] ?? null,
+            ]);
+        }
+
+        // Fallback to regular chat without location
         $result = $this->aiService->chat($message, $user->id, $conversationId);
 
         $endTime = microtime(true);
