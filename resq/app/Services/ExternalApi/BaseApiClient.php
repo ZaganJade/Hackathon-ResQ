@@ -56,13 +56,16 @@ abstract class BaseApiClient
             ->retry($this->maxRetries, $this->retryDelay, function ($exception, $request) {
                 // Only retry on connection errors or 5xx responses
                 if ($exception instanceof ConnectionException) {
-                    Log::warning("Connection error for {$this->getServiceName()}, retrying...", [
-                        'url' => $request->url(),
-                    ]);
+                    Log::warning("Connection error for {$this->getServiceName()}, retrying...");
                     return true;
                 }
                 return false;
             });
+
+        // Disable SSL verification for development (Windows/Laragon issue)
+        if (app()->environment('local', 'development')) {
+            $client = $client->withoutVerifying();
+        }
 
         if (!empty($this->headers)) {
             $client = $client->withHeaders($this->headers);
