@@ -91,7 +91,7 @@
             {{-- HERO HEADER --}}
             <section class="relative overflow-hidden glass-dark border-b border-white/5" data-aos="fade-down" data-aos-duration="1000">
                 <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
                     <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
                 </div>
                 <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-6 sm:pt-6 sm:pb-8">
@@ -105,7 +105,7 @@
                     </nav>
 
                     <div class="flex items-center gap-4" data-aos="fade-right" data-aos-delay="200">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
                         </div>
                         <div>
@@ -147,7 +147,7 @@
                                         @else
                                             <div class="h-36 bg-slate-800/50 relative flex items-center justify-center overflow-hidden border-b border-white/5">
                                                 <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                                                <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-sky-500/10 rounded-full blur-xl"></div>
+                                                <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                                             </div>
                                         @endif
                                         <div class="p-5">

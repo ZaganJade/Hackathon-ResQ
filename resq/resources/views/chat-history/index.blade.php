@@ -64,13 +64,13 @@
             {{-- Hero --}}
             <section class="relative overflow-hidden glass-dark border-b border-white/5" data-aos="fade-down" data-aos-duration="1000">
                 <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-16 -right-16 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
                     <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
                 </div>
                 <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-6 sm:pt-8 sm:pb-8">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex items-center gap-4" data-aos="fade-right" data-aos-delay="200">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div>
@@ -78,7 +78,7 @@
                                 <p class="text-slate-400 text-sm mt-0.5">Kelola percakapan AI Anda</p>
                             </div>
                         </div>
-                        <a href="{{ route('ai-assist.index') }}" data-aos="fade-left" data-aos-delay="300" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full text-sm font-semibold hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] shadow-md">
+                        <a href="{{ route('ai-assist.index') }}" data-aos="fade-left" data-aos-delay="300" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-sm font-semibold hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Chat Baru
                         </a>
@@ -90,10 +90,10 @@
                 {{-- Stats --}}
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                     @php $statCards = [
-                        ['label'=>'Total Percakapan','value'=>$stats['total_conversations'],'icon'=>'💬','gradient'=>'from-sky-500/20 to-blue-500/10','border'=>'border-sky-500/20','text'=>'text-sky-400'],
+                        ['label'=>'Total Percakapan','value'=>$stats['total_conversations'],'icon'=>'💬','gradient'=>'from-emerald-500/20 to-green-500/10','border'=>'border-emerald-500/20','text'=>'text-emerald-400'],
                         ['label'=>'Total Pesan','value'=>$stats['total_messages'],'icon'=>'📝','gradient'=>'from-emerald-500/20 to-green-500/10','border'=>'border-emerald-500/20','text'=>'text-emerald-400'],
                         ['label'=>'Waktu Respons','value'=>$stats['avg_response_time'].'s','icon'=>'⚡','gradient'=>'from-amber-500/20 to-yellow-500/10','border'=>'border-amber-500/20','text'=>'text-amber-400'],
-                        ['label'=>'Chat Pertama','value'=>$stats['first_conversation_date'] ? \Carbon\Carbon::parse($stats['first_conversation_date'])->format('d M Y') : '-','icon'=>'📅','gradient'=>'from-violet-500/20 to-purple-500/10','border'=>'border-violet-500/20','text'=>'text-violet-400'],
+                        ['label'=>'Chat Pertama','value'=>$stats['first_conversation_date'] ? \Carbon\Carbon::parse($stats['first_conversation_date'])->format('d M Y') : '-','icon'=>'📅','gradient'=>'from-green-500/20 to-emerald-500/10','border'=>'border-green-500/20','text'=>'text-green-400'],
                     ]; @endphp
                     @foreach($statCards as $index => $s)
                         <div class="glass-dark rounded-2xl border {{ $s['border'] }} shadow-soft p-4 hover:bg-white/5 transition-all duration-300" data-aos="zoom-in" data-aos-delay="{{ $index * 100 }}">
@@ -114,17 +114,17 @@
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-xs font-semibold text-slate-400 mb-1.5">Cari Percakapan</label>
                             <input type="text" name="search" value="{{ $filters['search'] }}" placeholder="Ketik kata kunci..."
-                                   class="w-full rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/30 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-all duration-200">
+                                   class="w-full rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/30 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-all duration-200">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1.5">Dari</label>
                             <input type="date" name="from_date" value="{{ $filters['from_date'] }}"
-                                   class="rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/30 px-4 py-2.5 text-sm text-white transition-all duration-200">
+                                   class="rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/30 px-4 py-2.5 text-sm text-white transition-all duration-200">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-400 mb-1.5">Sampai</label>
                             <input type="date" name="to_date" value="{{ $filters['to_date'] }}"
-                                   class="rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/30 px-4 py-2.5 text-sm text-white transition-all duration-200">
+                                   class="rounded-xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/30 px-4 py-2.5 text-sm text-white transition-all duration-200">
                         </div>
                         <div class="flex gap-2">
                             <button type="submit" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl text-sm font-semibold hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-200 active:scale-[0.98]">
@@ -144,14 +144,14 @@
                             </div>
                             <h3 class="text-lg font-bold text-white mb-2">Belum Ada Percakapan</h3>
                             <p class="text-sm text-slate-400 mb-4">Mulai chat dengan AI Assist untuk melihat riwayat di sini.</p>
-                            <a href="{{ route('ai-assist.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-full text-sm font-semibold hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:scale-[1.02] transition-all duration-300">Mulai Chat</a>
+                            <a href="{{ route('ai-assist.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-full text-sm font-semibold hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300">Mulai Chat</a>
                         </div>
                     @else
                         @foreach($conversations as $index => $conversation)
-                            <div class="glass-dark rounded-2xl border border-white/5 shadow-soft hover:border-violet-500/20 hover:bg-white/5 transition-all duration-300 overflow-hidden group" data-aos="fade-up" data-aos-delay="{{ $index * 60 }}">
+                            <div class="glass-dark rounded-2xl border border-white/5 shadow-soft hover:border-emerald-500/20 hover:bg-white/5 transition-all duration-300 overflow-hidden group" data-aos="fade-up" data-aos-delay="{{ $index * 60 }}">
                                 <div class="p-5 flex items-start justify-between gap-4">
                                     <a href="{{ route('chat-history.show', $conversation->conversation_id) }}" class="flex-1 min-w-0">
-                                        <h3 class="font-bold text-white group-hover:text-violet-400 transition-colors truncate mb-1">{{ $conversation->title }}</h3>
+                                        <h3 class="font-bold text-white group-hover:text-emerald-400 transition-colors truncate mb-1">{{ $conversation->title }}</h3>
                                         <p class="text-sm text-slate-400 line-clamp-2 mb-3">{{ $conversation->preview }}</p>
                                         <div class="flex flex-wrap items-center gap-3 text-[10px] text-slate-500 font-medium">
                                             <span class="flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
