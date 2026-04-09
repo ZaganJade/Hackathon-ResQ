@@ -37,14 +37,7 @@
         </div>
 
         {{-- ============================================
-        2. ZONE STATUS WIDGET — Location-based disaster alert
-        ============================================ --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <x-zone-status-widget />
-        </div>
-
-        {{-- ============================================
-        3. DESKTOP SIDEBAR — Invisible → Visible
+        2. DESKTOP SIDEBAR — Invisible → Visible
         ============================================ --}}
         <aside class="hidden lg:flex fixed top-0 left-0 h-full z-50 flex-col" x-data="{ sidebarHover: false }"
             @mouseenter="sidebarHover = true" @mouseleave="sidebarHover = false">
@@ -276,7 +269,50 @@
                 </section>
 
                 {{-- ============================================
-                5. DISASTER CONTENT — Modern Horizontal Cards
+                5. ZONE STATUS WIDGET — Location-based disaster alert
+                Integrated into main content grid for better visual flow
+                ============================================ --}}
+                <section class="animate-fade-up stagger-3">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
+                        {{-- Zone Status Widget — Takes 1 column on desktop --}}
+                        <div class="lg:col-span-1">
+                            <x-zone-status-widget />
+                        </div>
+
+                        {{-- Live Disaster Stats — Takes 2 columns on desktop --}}
+                        <div class="lg:col-span-2 bg-white/[0.04] border border-white/[0.06] rounded-2xl p-5 shadow-card">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    <h3 class="font-semibold text-white">Statistik Bencana Real-time</h3>
+                                </div>
+                                <span class="text-xs text-emerald-400 flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    Live
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="text-center p-3 bg-white/[0.03] rounded-xl">
+                                    <p class="text-2xl font-bold text-white" x-text="stats.totalDisasters || 0">-</p>
+                                    <p class="text-xs text-slate-400 mt-1">Total Bencana</p>
+                                </div>
+                                <div class="text-center p-3 bg-white/[0.03] rounded-xl">
+                                    <p class="text-2xl font-bold text-rose-400" x-text="stats.highRisk || 0">-</p>
+                                    <p class="text-xs text-slate-400 mt-1">Risiko Tinggi</p>
+                                </div>
+                                <div class="text-center p-3 bg-white/[0.03] rounded-xl">
+                                    <p class="text-2xl font-bold text-emerald-400" x-text="stats.safeZones || 0">-</p>
+                                    <p class="text-xs text-slate-400 mt-1">Zona Aman</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {{-- ============================================
+                6. DISASTER CONTENT — Modern Horizontal Cards
                 Desktop: 2-col, Tablet/Mobile: 1-col
                 ============================================ --}}
                 <section class="animate-fade-up stagger-3">

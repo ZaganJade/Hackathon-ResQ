@@ -201,19 +201,25 @@
                                            class="tilt-card card-fluid glass-dark border border-white/5 rounded-2xl shadow-soft overflow-hidden group flex flex-col transition-all duration-300 transform"
                                            data-aos="zoom-in-up" data-aos-delay="{{ $index * 100 }}"
                                            data-tilt data-tilt-glare data-tilt-max-glare="0.2" data-tilt-scale="1.02">
-                                            @if($guide->image)
-                                                <div class="relative h-44 overflow-hidden border-b border-white/5">
-                                                    <img src="{{ asset('storage/' . $guide->image) }}" alt="{{ $guide->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
-                                                </div>
-                                            @else
-                                                <div class="h-44 bg-slate-800/50 flex items-center justify-center relative overflow-hidden border-b border-white/5">
-                                                    <svg class="w-12 h-12 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                                    </svg>
-                                                    <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
-                                                </div>
-                                            @endif
+                                            @php
+                                                $unsplashImages = [
+                                                    'earthquake' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+                                                    'flood' => 'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=800&q=80',
+                                                    'landslide' => 'https://images.unsplash.com/photo-1518182170546-0766ce6fec56?w=800&q=80',
+                                                    'tsunami' => 'https://images.unsplash.com/photo-1518171307829-8a08b7955e66?w=800&q=80',
+                                                    'fire' => 'https://images.unsplash.com/photo-1468322638156-074863f9362e?w=800&q=80',
+                                                    'volcano' => 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80',
+                                                    'general' => 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=800&q=80',
+                                                ];
+                                                $categoryImage = $unsplashImages[$category] ?? $unsplashImages['general'];
+                                                $imageUrl = $guide->image && file_exists(public_path('storage/' . $guide->image))
+                                                    ? asset('storage/' . $guide->image)
+                                                    : $categoryImage;
+                                            @endphp
+                                            <div class="relative h-44 overflow-hidden border-b border-white/5">
+                                                <img src="{{ $imageUrl }}" alt="{{ $guide->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+                                            </div>
 
                                             <div class="p-5 flex-1 flex flex-col relative z-20">
                                                 <h3 class="font-bold text-white group-hover:text-emerald-400 transition-colors line-clamp-2 mb-2 text-sm sm:text-base">

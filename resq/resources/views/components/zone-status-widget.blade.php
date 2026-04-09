@@ -7,20 +7,20 @@
 ?>
 <div
     x-data="zoneStatusWidget()"
-    class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden"
+    class="bg-white/[0.04] backdrop-blur-sm rounded-2xl shadow-card border border-white/[0.06] overflow-hidden h-full"
 >
     <!-- Header -->
-    <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+    <div class="px-6 py-4 bg-white/[0.03] border-b border-white/[0.06] flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <h3 class="font-semibold text-slate-700">Status Zona Anda</h3>
+            <h3 class="font-semibold text-white">Status Zona Anda</h3>
         </div>
         <button
             @click="refreshLocation()"
-            class="text-slate-400 hover:text-primary-600 transition"
+            class="text-slate-400 hover:text-emerald-400 transition"
             :class="{ 'animate-spin': isLoading }"
             title="Refresh lokasi"
         >
@@ -34,27 +34,27 @@
     <div class="p-6">
         <!-- Loading State -->
         <div x-show="status === 'loading'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                <svg class="animate-spin h-8 w-8 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/[0.05] mb-4">
+                <svg class="animate-spin h-8 w-8 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
             </div>
-            <p class="text-slate-600">Mendeteksi lokasi Anda...</p>
+            <p class="text-slate-300">Mendeteksi lokasi Anda...</p>
         </div>
 
         <!-- Permission Request State -->
         <div x-show="status === 'requesting'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
-            <p class="text-slate-600 mb-4">Izinkan akses lokasi untuk mendapatkan peringatan bencana personal</p>
+            <p class="text-slate-300 mb-4">Izinkan akses lokasi untuk mendapatkan peringatan bencana personal</p>
             <button
                 @click="requestLocation()"
-                class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition"
+                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition"
             >
                 Izinkan Lokasi
             </button>
@@ -62,16 +62,16 @@
 
         <!-- Denied State -->
         <div x-show="status === 'denied'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             </div>
-            <p class="text-slate-600 mb-2">Akses lokasi ditolak</p>
-            <p class="text-sm text-slate-500 mb-4">Aktifkan izin lokasi di browser Anda untuk fitur peringatan bencana</p>
+            <p class="text-slate-300 mb-2">Akses lokasi ditolak</p>
+            <p class="text-sm text-slate-400 mb-4">Aktifkan izin lokasi di browser Anda untuk fitur peringatan bencana</p>
             <button
                 @click="requestLocation()"
-                class="text-primary-600 hover:underline text-sm"
+                class="text-emerald-400 hover:underline text-sm"
             >
                 Coba Lagi
             </button>
@@ -79,15 +79,15 @@
 
         <!-- Warning State (Permission Denied but with warning icon variation) -->
         <div x-show="status === 'warning'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <p class="text-slate-600 mb-2" x-text="errorMessage || 'Peringatan lokasi'"></p>
+            <p class="text-slate-300 mb-2" x-text="errorMessage || 'Peringatan lokasi'"></p>
             <button
                 @click="requestLocation()"
-                class="text-primary-600 hover:underline text-sm"
+                class="text-emerald-400 hover:underline text-sm"
             >
                 Coba Lagi
             </button>
@@ -95,16 +95,16 @@
 
         <!-- Error State -->
         <div x-show="status === 'error'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <p class="text-slate-600 mb-2">Gagal mendeteksi lokasi</p>
-            <p class="text-sm text-slate-500 mb-4" x-text="errorMessage"></p>
+            <p class="text-slate-300 mb-2">Gagal mendeteksi lokasi</p>
+            <p class="text-sm text-slate-400 mb-4" x-text="errorMessage"></p>
             <button
                 @click="requestLocation()"
-                class="text-primary-600 hover:underline text-sm"
+                class="text-emerald-400 hover:underline text-sm"
             >
                 Coba Lagi
             </button>
@@ -117,17 +117,17 @@
                 <div
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
                     :class="{
-                        'bg-red-100 text-red-700': zoneStatus === 'danger',
-                        'bg-amber-100 text-amber-700': zoneStatus === 'warning',
-                        'bg-emerald-100 text-emerald-700': zoneStatus === 'safe'
+                        'bg-rose-500/20 text-rose-300 border border-rose-500/30': zoneStatus === 'danger',
+                        'bg-amber-500/20 text-amber-300 border border-amber-500/30': zoneStatus === 'warning',
+                        'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30': zoneStatus === 'safe'
                     }"
                 >
                     <span
                         class="w-2.5 h-2.5 rounded-full animate-pulse"
                         :class="{
-                            'bg-red-500': zoneStatus === 'danger',
-                            'bg-amber-500': zoneStatus === 'warning',
-                            'bg-emerald-500': zoneStatus === 'safe'
+                            'bg-rose-400': zoneStatus === 'danger',
+                            'bg-amber-400': zoneStatus === 'warning',
+                            'bg-emerald-400': zoneStatus === 'safe'
                         }"
                     ></span>
                     <span x-text="zoneLabel"></span>
@@ -138,10 +138,10 @@
             <!-- Alert Message for Danger/Warning -->
             <div
                 x-show="zoneStatus === 'danger' || zoneStatus === 'warning'"
-                class="rounded-lg p-4 text-sm"
+                class="rounded-lg p-4 text-sm border"
                 :class="{
-                    'bg-red-50 border border-red-200 text-red-800': zoneStatus === 'danger',
-                    'bg-amber-50 border border-amber-200 text-amber-800': zoneStatus === 'warning'
+                    'bg-rose-500/10 border-rose-500/20 text-rose-200': zoneStatus === 'danger',
+                    'bg-amber-500/10 border-amber-500/20 text-amber-200': zoneStatus === 'warning'
                 }"
             >
                 <div class="flex items-start gap-2">
@@ -158,18 +158,18 @@
 
             <!-- Stats Grid -->
             <div class="grid grid-cols-2 gap-3">
-                <div class="bg-slate-50 rounded-lg p-3">
-                    <p class="text-xs text-slate-500 mb-1">Bencana di Area (50km)</p>
-                    <p class="text-xl font-bold text-slate-700" x-text="metrics.total_disasters"></p>
+                <div class="bg-white/[0.03] rounded-lg p-3">
+                    <p class="text-xs text-slate-400 mb-1">Bencana di Area (50km)</p>
+                    <p class="text-xl font-bold text-white" x-text="metrics.total_disasters"></p>
                 </div>
-                <div class="bg-slate-50 rounded-lg p-3">
-                    <p class="text-xs text-slate-500 mb-1">Cluster Aktif</p>
+                <div class="bg-white/[0.03] rounded-lg p-3">
+                    <p class="text-xs text-slate-400 mb-1">Cluster Aktif</p>
                     <p
                         class="text-xl font-bold"
                         :class="{
-                            'text-red-600': metrics.max_cluster >= 10,
-                            'text-amber-600': metrics.max_cluster >= 5 && metrics.max_cluster < 10,
-                            'text-emerald-600': metrics.max_cluster < 5
+                            'text-rose-400': metrics.max_cluster >= 10,
+                            'text-amber-400': metrics.max_cluster >= 5 && metrics.max_cluster < 10,
+                            'text-emerald-400': metrics.max_cluster < 5
                         }"
                         x-text="metrics.max_cluster"
                     ></p>
@@ -178,13 +178,13 @@
 
             <!-- Trend -->
             <div class="flex items-center gap-2 text-sm">
-                <span class="text-slate-500">Trend:</span>
+                <span class="text-slate-400">Trend:</span>
                 <span
                     class="font-medium"
                     :class="{
-                        'text-red-600': trend === 'increasing',
-                        'text-emerald-600': trend === 'decreasing',
-                        'text-slate-600': trend === 'stable'
+                        'text-rose-400': trend === 'increasing',
+                        'text-emerald-400': trend === 'decreasing',
+                        'text-slate-300': trend === 'stable'
                     }"
                     x-text="trendLabel"
                 ></span>
@@ -192,8 +192,8 @@
                     x-show="trendChange !== 0"
                     class="text-xs"
                     :class="{
-                        'text-red-500': trendChange > 0,
-                        'text-emerald-500': trendChange < 0
+                        'text-rose-400': trendChange > 0,
+                        'text-emerald-400': trendChange < 0
                     }"
                     x-text="(trendChange > 0 ? '+' : '') + trendChange + '%'"
                 ></span>
@@ -201,11 +201,11 @@
 
             <!-- Recommendations -->
             <div x-show="recommendations.length > 0" class="space-y-2">
-                <p class="text-sm font-medium text-slate-700">Rekomendasi:</p>
+                <p class="text-sm font-medium text-slate-200">Rekomendasi:</p>
                 <ul class="space-y-1">
                     <template x-for="rec in recommendations.slice(0, 3)" :key="rec">
-                        <li class="flex items-start gap-2 text-sm text-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary-500 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <li class="flex items-start gap-2 text-sm text-slate-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
                             <span x-text="rec"></span>
@@ -216,25 +216,25 @@
 
             <!-- Nearby Disasters List -->
             <div x-show="nearbyDisasters.length > 0" class="space-y-2">
-                <p class="text-sm font-medium text-slate-700">Bencana Terdekat:</p>
+                <p class="text-sm font-medium text-slate-200">Bencana Terdekat:</p>
                 <div class="space-y-2 max-h-48 overflow-y-auto">
                     <template x-for="disaster in nearbyDisasters.slice(0, 5)" :key="disaster.id">
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 text-sm">
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-white/[0.03] text-sm">
                             <div class="flex items-center gap-2">
                                 <span
                                     class="w-2 h-2 rounded-full"
                                     :class="{
-                                        'bg-red-500': disaster.severity === 'critical' || disaster.severity === 'high',
-                                        'bg-amber-500': disaster.severity === 'medium',
-                                        'bg-emerald-500': disaster.severity === 'low'
+                                        'bg-rose-400': disaster.severity === 'critical' || disaster.severity === 'high',
+                                        'bg-amber-400': disaster.severity === 'medium',
+                                        'bg-emerald-400': disaster.severity === 'low'
                                     }"
                                 ></span>
                                 <div>
-                                    <p class="font-medium text-slate-700 capitalize" x-text="disaster.type"></p>
-                                    <p class="text-xs text-slate-500" x-text="disaster.location"></p>
+                                    <p class="font-medium text-slate-200 capitalize" x-text="disaster.type"></p>
+                                    <p class="text-xs text-slate-400" x-text="disaster.location"></p>
                                 </div>
                             </div>
-                            <span class="text-xs text-slate-500" x-text="disaster.distance_km + ' km'"></span>
+                            <span class="text-xs text-slate-400" x-text="disaster.distance_km + ' km'"></span>
                         </div>
                     </template>
                 </div>
@@ -243,8 +243,8 @@
     </div>
 
     <!-- Footer -->
-    <div class="px-6 py-3 bg-slate-50 border-t border-slate-100">
-        <a href="{{ route('map.index') }}" class="flex items-center justify-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition">
+    <div class="px-6 py-3 bg-white/[0.03] border-t border-white/[0.06]">
+        <a href="{{ route('map.index') }}" class="flex items-center justify-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
             </svg>
