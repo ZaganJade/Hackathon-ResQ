@@ -71,6 +71,15 @@ class NotificationService
         }
     }
 
+    /**
+     * Send WhatsApp message to a phone number (wrapper for sendMessage).
+     * Used by CheckLocationRiskCommand for location-based risk notifications.
+     */
+    public function sendWhatsApp(string $phoneNumber, string $message): array
+    {
+        return $this->sendMessage($phoneNumber, $message);
+    }
+
     // ----------------------------------------------------------------
     // 9.4  Exponential back-off retry (called from Job)
     // ----------------------------------------------------------------

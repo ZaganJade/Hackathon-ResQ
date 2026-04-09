@@ -77,6 +77,22 @@
             </button>
         </div>
 
+        <!-- Warning State (Permission Denied but with warning icon variation) -->
+        <div x-show="status === 'warning'" class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <p class="text-slate-600 mb-2" x-text="errorMessage || 'Peringatan lokasi'"></p>
+            <button
+                @click="requestLocation()"
+                class="text-primary-600 hover:underline text-sm"
+            >
+                Coba Lagi
+            </button>
+        </div>
+
         <!-- Error State -->
         <div x-show="status === 'error'" class="text-center py-8">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
