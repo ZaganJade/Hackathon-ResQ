@@ -136,10 +136,24 @@
             </div>
 
             {{-- Featured Image --}}
-            @if($guide->image)
+            @php
+                $unsplashImages = [
+                    'earthquake' => 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+                    'flood' => 'https://images.unsplash.com/photo-1547683905-f686c993aae5?w=1200&q=80',
+                    'landslide' => 'https://images.unsplash.com/photo-1518182170546-0766ce6fec56?w=1200&q=80',
+                    'tsunami' => 'https://images.unsplash.com/photo-1518171307829-8a08b7955e66?w=1200&q=80',
+                    'fire' => 'https://images.unsplash.com/photo-1468322638156-074863f9362e?w=1200&q=80',
+                    'volcano' => 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1200&q=80',
+                    'general' => 'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=1200&q=80',
+                ];
+                $categoryImage = $unsplashImages[$guide->category] ?? $unsplashImages['general'];
+                $hasLocalImage = $guide->image && file_exists(public_path('storage/' . $guide->image));
+                $imageUrl = $hasLocalImage ? asset('storage/' . $guide->image) : $categoryImage;
+            @endphp
+            @if($guide->image || !$hasLocalImage)
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-10 relative z-20" data-aos="zoom-in" data-aos-delay="300">
                     <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative group">
-                        <img src="{{ asset('storage/' . $guide->image) }}" alt="{{ $guide->title }}" class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700">
+                        <img src="{{ $imageUrl }}" alt="{{ $guide->title }}" class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
                     </div>
                 </div>

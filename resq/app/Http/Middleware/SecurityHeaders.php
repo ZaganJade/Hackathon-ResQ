@@ -31,11 +31,11 @@ class SecurityHeaders
 
         // Content Security Policy (CSP) - Adjust as needed for your frontend
         $csp = "default-src 'self'; " .
-               "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com unpkg.com; " .
-               "style-src 'self' 'unsafe-inline' *.googleapis.com fonts.googleapis.com fonts.bunny.net unpkg.com; " .
-               "img-src 'self' data: blob: *.googleapis.com *.gstatic.com *.google.com *.openstreetmap.org *.tile.openstreetmap.org *.cartocdn.com; " .
-               "font-src 'self' fonts.gstatic.com fonts.bunny.net; " .
-               "connect-src 'self' *.fireworks.ai *.googleapis.com *.wablas.com *.yobase.io *.yobase.me nominatim.openstreetmap.org unpkg.com; " .
+               "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googleapis.com *.gstatic.com unpkg.com cdnjs.cloudflare.com; " .
+               "style-src 'self' 'unsafe-inline' *.googleapis.com fonts.googleapis.com fonts.bunny.net unpkg.com cdnjs.cloudflare.com; " .
+               "img-src 'self' data: blob: storage: *.googleapis.com *.gstatic.com *.google.com *.openstreetmap.org *.tile.openstreetmap.org *.cartocdn.com images.unsplash.com images.unsplash.com *.unsplash.com; " .
+               "font-src 'self' fonts.gstatic.com fonts.bunny.net cdnjs.cloudflare.com; " .
+               "connect-src 'self' *.fireworks.ai *.googleapis.com *.wablas.com *.yobase.io *.yobase.me nominatim.openstreetmap.org unpkg.com cdnjs.cloudflare.com; " .
                "frame-src 'self' *.youtube.com *.youtu.be *.youtube-nocookie.com; " .
                "object-src 'none'; " .
                "base-uri 'self'; " .
