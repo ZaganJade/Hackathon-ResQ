@@ -124,16 +124,20 @@ class WhatsAppService extends BaseApiClient
                 // Make request based on provider
                 if ($this->provider === 'yobase') {
                     // Yobase uses X-Api-Key header
+                    // Host header required when using IP address directly
                     $response = Http::timeout($this->timeout)
+                        ->connectTimeout(20) // Allow extra time for connection
                         ->withHeaders([
                             'X-Api-Key' => $this->apiKey,
                             'Content-Type' => 'application/json',
                             'Accept' => 'application/json',
+                            'Host' => 'whats.yobase.me',
                         ])
                         ->post($url, $payload);
                 } else {
                     // Other providers use Bearer token
                     $response = Http::timeout($this->timeout)
+                        ->connectTimeout(20)
                         ->withToken($this->apiKey)
                         ->asJson()
                         ->post($url, $payload);

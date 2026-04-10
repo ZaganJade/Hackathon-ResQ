@@ -352,12 +352,12 @@ class BMKGEarthquakeScraper:
     def send_webhook_notification(self, earthquake: Dict[str, Any], webhook_url: str, api_key: str) -> bool:
         """
         Send earthquake notification to webhook endpoint
-        
+
         Args:
             earthquake: Earthquake data dictionary
             webhook_url: URL of the webhook endpoint
             api_key: API key for webhook authentication
-            
+
         Returns:
             True if successful, False otherwise
         """
@@ -365,33 +365,38 @@ class BMKGEarthquakeScraper:
             severity = self.classify_severity(earthquake.get('magnitude'))
             location = earthquake.get('location', 'Unknown Location')
             magnitude = earthquake.get('magnitude', 0)
-            
+
+            # Skip notification for low severity (only send for medium, high, critical)
+            if severity == 'low':
+                print(f"Skipping notification for severity '{severity}' (magnitude {magnitude}) - below threshold")
+                return True
+
+            print(f"Sending notification for severity '{severity}' (magnitude {magnitude})")
+
+            # Format lokasi yang readable (bukan koordinat mentah)
+            loc_display = location if location and not location.replace('.', '').replace(',', '').replace('-', '').isdigit() else "Lokasi tidak diketahui"
+
             payload = {
-                "message": f"Peringatan gempa magnitude {magnitude} di {location}!",
+                "message": f"Gempa magnitude {magnitude} terdeteksi di {loc_display}",
                 "disaster_type": "earthquake",
-                "location": f"{earthquake.get('latitude')}, {earthquake.get('longitude')}",
-                # "latitude": earthquake.get('latitude'),
-                # "longitude": earthquake.get('longitude'),
+                "location": loc_display,
                 "severity": severity,
-                # "magnitude": magnitude,
-                # "depth_km": earthquake.get('depth_km'),
-                # "datetime": earthquake.get('datetime'),
             }
-            
+
             headers = {
                 "X-API-Key": api_key,
                 "Content-Type": "application/json"
             }
-            
-            response = requests.post(webhook_url, json=payload,  headers=headers, timeout=10)
-            
+
+            response = requests.post(webhook_url, json=payload, headers=headers, timeout=10)
+
             if response.status_code in [200, 201]:
-                print(f"Webhook notification sent successfully for earthquake at {location}")
+                print(f"Webhook notification sent successfully for earthquake at {location} (severity: {severity})")
                 return True
             else:
                 print(f"Webhook notification failed with status {response.status_code}: {response.text}")
                 return False
-                
+
         except Exception as e:
             print(f"Error sending webhook notification: {e}")
             return False

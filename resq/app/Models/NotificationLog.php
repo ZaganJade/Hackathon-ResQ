@@ -38,7 +38,9 @@ class NotificationLog extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Guest',
+        ]);
     }
 
     /**
@@ -71,9 +73,11 @@ class NotificationLog extends Model
      */
     public function markAsSent(): void
     {
+        $now = now();
         $this->update([
             'status' => self::STATUS_SENT,
-            'sent_at' => now(),
+            'sent_at' => $now,
+            'delivered_at' => $now, // Provider tidak support delivery status, anggap sent = delivered
         ]);
     }
 

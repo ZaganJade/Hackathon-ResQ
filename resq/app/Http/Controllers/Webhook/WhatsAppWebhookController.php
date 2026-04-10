@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Webhook;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendWhatsAppNotificationJob;
+use App\Models\NotificationLog;
 use App\Services\ExternalApi\WhatsAppService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -103,11 +106,27 @@ class WhatsAppWebhookController extends Controller
         // Build message with template if disaster info provided
         $message = $this->buildMessage($validated);
 
-        // Send WhatsApp message
+        // Send WhatsApp message and create notification log
         try {
             $startTime = microtime(true);
+            $notificationService = app(NotificationService::class);
 
-            $result = $this->whatsAppService->send($phone, $message);
+            // Create notification log for guest user (user_id = null)
+            $log = $notificationService->createLog(
+                userId: null,
+                phone: $phone,
+                message: $message
+            );
+
+            // Send message
+            $result = $notificationService->sendMessage($phone, $message);
+
+            // Update log status based on result
+            if ($result['success']) {
+                $log->markAsSent();
+            } else {
+                $log->markAsFailed($result['error'] ?? 'unknown_error');
+            }
 
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
 
@@ -118,22 +137,24 @@ class WhatsAppWebhookController extends Controller
                 'response_time_ms' => $responseTime,
                 'disaster_type' => $validated['disaster_type'] ?? null,
                 'ip' => $request->ip(),
+                'notification_log_id' => $log->id,
             ]);
 
             return response()->json([
-                'success' => true,
+                'success' => $result['success'],
                 'data' => [
                     'message_id' => $result['message_id'],
                     'phone' => $phone,
-                    'status' => $result['status'],
-                    'sent_at' => $result['sent_at'],
-                    'provider' => $result['provider'] ?? 'yobase',
+                    'status' => $result['success'] ? 'sent' : 'failed',
+                    'sent_at' => now()->toIso8601String(),
+                    'provider' => 'yobase',
+                    'notification_log_id' => $log->id,
                 ],
                 'meta' => [
                     'response_time_ms' => $responseTime,
                     'timestamp' => now()->toIso8601String(),
                 ],
-            ], 200);
+            ], $result['success'] ? 200 : 500);
 
         } catch (\Throwable $e) {
             Log::error('WhatsApp webhook failed', [
@@ -210,8 +231,8 @@ class WhatsAppWebhookController extends Controller
     {
         $message = $data['message'];
 
-        // If disaster info provided, prepend with template
-        if (!empty($data['disaster_type']) || !empty($data['location'])) {
+        // If disaster info provided, build clean message
+        if (!empty($data['disaster_type'])) {
             $severityEmoji = [
                 'critical' => '🚨',
                 'high' => '⚠️',
@@ -219,31 +240,53 @@ class WhatsAppWebhookController extends Controller
                 'low' => 'ℹ️',
             ][$data['severity'] ?? 'medium'] ?? '⚠️';
 
+            $severityText = [
+                'critical' => 'KRITIS - Segera evakuasi!',
+                'high' => 'TINGGI - Waspada & siap evakuasi',
+                'medium' => 'SEDANG - Pantau perkembangan',
+                'low' => 'RENDAH - Tetap waspada',
+            ][$data['severity'] ?? 'medium'] ?? 'Waspada';
+
             $typeTranslations = [
-                'earthquake' => 'Gempa Bumi',
-                'flood' => 'Banjir',
-                'tsunami' => 'Tsunami',
-                'landslide' => 'Tanah Longsor',
-                'volcanic_eruption' => 'Letusan Gunung Berapi',
-                'fire' => 'Kebakaran',
-                'tornado' => 'Puting Beliung',
+                'earthquake' => 'GEMPA BUMI',
+                'flood' => 'BANJIR',
+                'tsunami' => 'TSUNAMI',
+                'landslide' => 'TANAH LONGSOR',
+                'volcanic_eruption' => 'LETUSAN GUNUNG BERAPI',
+                'fire' => 'KEBAKARAN',
+                'tornado' => 'PUTING BELIUNG',
             ];
 
-            $typeId = $typeTranslations[$data['disaster_type'] ?? ''] ?? ($data['disaster_type'] ?? 'Bencana');
+            $typeId = $typeTranslations[$data['disaster_type'] ?? ''] ?? strtoupper($data['disaster_type'] ?? 'BENCANA');
 
-            $header = "{$severityEmoji} *PERINGATAN {$typeId}*\n\n";
-
-            if (!empty($data['location'])) {
-                $header .= "📍 Lokasi: {$data['location']}\n";
+            // Use location from message if coords, or from data
+            $location = $data['location'] ?? '';
+            if (preg_match('/^-?\d+\.\d+/', $location)) {
+                // If location is coordinates, extract readable location from message
+                preg_match('/di\s+(.+)!?$/', $message, $matches);
+                $location = $matches[1] ?? $location;
             }
 
-            if (!empty($data['severity'])) {
-                $header .= "📊 Tingkat: " . ucfirst($data['severity']) . "\n";
-            }
+            // Extract magnitude from message
+            preg_match('/magnitude\s+([\d.]+)/i', $message, $magMatch);
+            $magnitude = $magMatch[1] ?? null;
 
-            $header .= "\n";
+            $magLine = $magnitude ? "🔢 *Magnitudo: M{$magnitude}*\n" : '';
 
-            $message = $header . $message;
+            return <<<MSG
+{$severityEmoji} *PERINGATAN {$typeId}*
+
+📍 *Lokasi:* {$location}
+{$magLine}⚠️ *Status:* {$severityText}
+
+🛡️ *Tips Keselamatan:*
+• Tetap tenang, jangan panik
+• Cari tempat berlindung yang aman
+• Jauhi jendela, kaca, dan benda berat
+• Ikuti arahan dari petugas darurat
+
+📞 Darurat: 119 | 🌐 resq.id
+MSG;
         }
 
         return $message;
@@ -269,14 +312,14 @@ class WhatsAppWebhookController extends Controller
      */
     public function broadcast(Request $request): JsonResponse
     {
-        // Rate limiting: max 10 broadcast requests per hour per API key
+        // Rate limiting: max 20 broadcast requests per hour per API key
         $apiKey = $request->header('X-API-Key');
         $rateLimitKey = 'webhook:whatsapp:broadcast:' . ($apiKey ?? 'unknown');
 
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 10)) {
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 20)) {
             return response()->json([
                 'success' => false,
-                'error' => 'Broadcast rate limit exceeded. Max 10 broadcasts per hour.',
+                'error' => 'Broadcast rate limit exceeded. Max 20 broadcasts per hour.',
                 'retry_after' => RateLimiter::availableIn($rateLimitKey),
             ], 429);
         }
@@ -333,6 +376,9 @@ class WhatsAppWebhookController extends Controller
             ], 404);
         }
 
+        // Allow ALL severity levels for notifications (low, medium, high, critical)
+        $severity = $validated['severity'] ?? 'medium';
+
         // Build message
         $message = $this->buildMessage($validated);
 
@@ -345,6 +391,7 @@ class WhatsAppWebhookController extends Controller
         ];
 
         $startTime = microtime(true);
+        $notificationService = app(NotificationService::class);
 
         foreach ($preferences as $preference) {
             try {
@@ -360,12 +407,17 @@ class WhatsAppWebhookController extends Controller
                     continue;
                 }
 
-                // Send message
-                $result = $this->whatsAppService->send($phone, $message);
+                // Create notification log and dispatch job
+                $log = $notificationService->createLog(
+                    $preference->user_id,
+                    $phone,
+                    $message
+                );
+                SendWhatsAppNotificationJob::dispatch($log);
                 $results['sent']++;
 
-                // Add small delay to avoid rate limiting
-                usleep(100000); // 100ms delay between messages
+                // Small delay to avoid rate limiting (jobs are dispatched to queue)
+                usleep(50000); // 50ms delay between dispatches
 
             } catch (\Throwable $e) {
                 $results['errors'][] = [
