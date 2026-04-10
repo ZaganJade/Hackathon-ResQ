@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "Bash(php -l app/Http/Controllers/*.php)",
+      "Bash(curl -s http://localhost:8000)",
+      "Bash(curl -s http://localhost:8000/dashboard)",
+      "Bash(curl:*)",
+      "Bash(php:*)",
+      "Bash(composer show:*)",
+      "Read(//c/laragon/bin/**)",
+      "Bash(pkill -f \"php artisan serve\")",
+      "Bash(taskkill /F /IM php.exe)",
+      "Bash(npm run:*)",
+      "Bash(mysql:*)"
     ]
   }
 }

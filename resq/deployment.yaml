@@ -1,0 +1,51 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laravel-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: laravel
+  template:
+    metadata:
+      labels:
+        app: laravel
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: laravel
+          image: zaganjade/laravel-hackathon
+          ports:
+            - containerPort: 80
+          env:
+            - name: APP_ENV
+              value: production
+            - name: APP_DEBUG
+              value: "false"
+            - name: APP_KEY
+              value: "base64:9t5YPFUB8r2t+XcRYgYxY/rKd9yzPYBwx3Iz3tlGe6M="
+            - name: APP_URL
+              value: "https://kanarazu-katsu.hackathon.sev-2.com"
+            - name: DB_CONNECTION
+              value: pgsql
+            - name: DB_HOST
+              value: "103.185.52.138"
+            - name: DB_PORT
+              value: "1185"
+            - name: DB_DATABASE
+              value: kanarazu_katsu
+            - name: DB_USERNAME
+              value: kanarazu_katsu
+            - name: DB_PASSWORD
+              value: "3u4m6?V)$J*AFuPZum8ouFWitM039}M7"
+            - name: CACHE_STORE
+              value: file
+            - name: SESSION_DRIVER
+              value: file
+            - name: QUEUE_CONNECTION
+              value: sync
+            - name: LOG_CHANNEL
+              value: stderr

@@ -55,16 +55,45 @@ class Disaster extends Model
 
     /**
      * Scope a query to only include disasters within a radius.
+     * Supports both PostgreSQL (with trig functions) and SQLite (bounding box only).
      */
     public function scopeWithinRadius(Builder $query, float $lat, float $lng, float $radiusKm): Builder
     {
-        // Using Haversine formula approximation for PostgreSQL
-        $earthRadius = 6371; // km
+        $driver = config('database.default');
 
-        return $query->whereRaw(
-            "($earthRadius * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?",
-            [$lat, $lng, $lat, $radiusKm]
-        );
+        // For PostgreSQL, use native SQL trig functions
+        if ($driver === 'pgsql') {
+            $earthRadius = 6371;
+            return $query->whereRaw(
+                "($earthRadius * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?",
+                [$lat, $lng, $lat, $radiusKm]
+            );
+        }
+
+        // For SQLite and others: use bounding box approximation only
+        // Full distance calculation must be done in PHP
+        // Approximate 1 degree = 111 km (simplified)
+        $latDelta = $radiusKm / 111;
+        $lngDelta = $radiusKm / (111 * cos(deg2rad($lat)));
+
+        return $query
+            ->whereBetween('latitude', [$lat - $latDelta, $lat + $latDelta])
+            ->whereBetween('longitude', [$lng - $lngDelta, $lng + $lngDelta]);
+    }
+
+    /**
+     * Calculate distance between two coordinates using Haversine formula.
+     */
+    public static function calculateDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371; // km
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLng / 2) * sin($dLng / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        return $earthRadius * $c;
     }
 
     /**

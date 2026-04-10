@@ -101,14 +101,37 @@ class LocationRiskService
 
     /**
      * Ambil bencana aktif di sekitar lokasi
+     * SQLite-compatible dengan filtering jarak di PHP
      */
     private function getNearbyActiveDisasters(float $lat, float $lng, float $radius): \Illuminate\Support\Collection
     {
+        $driver = config('database.default');
+
+        // For PostgreSQL, use SQL-level filtering
+        if ($driver === 'pgsql') {
+            return Disaster::active()
+                ->withinRadius($lat, $lng, $radius)
+                ->where('created_at', '>=', Carbon::now()->subDays(180))
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        // For SQLite: calculate bounding box in PHP, then filter
+        // Approximate 1 degree = 111 km
+        $latDelta = $radius / 111;
+        $lngDelta = $radius / (111 * cos(deg2rad($lat)));
+
         return Disaster::active()
-            ->withinRadius($lat, $lng, $radius)
-            ->where('created_at', '>=', Carbon::now()->subDays(180)) // Bencana 6 bulan terakhir
+            ->whereBetween('latitude', [$lat - $latDelta, $lat + $latDelta])
+            ->whereBetween('longitude', [$lng - $lngDelta, $lng + $lngDelta])
+            ->where('created_at', '>=', Carbon::now()->subDays(180))
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->filter(function ($disaster) use ($lat, $lng, $radius) {
+                // Calculate actual distance in PHP for SQLite
+                $distance = $this->calculateDistance($lat, $lng, $disaster->latitude, $disaster->longitude);
+                return $distance <= $radius;
+            });
     }
 
     /**
@@ -321,13 +344,12 @@ class LocationRiskService
         $currentPeriodStart = $now->copy()->subDays($daysBack);
         $previousPeriodStart = $now->copy()->subDays($daysBack * 2);
 
-        $currentDisasters = Disaster::active()
-            ->withinRadius($lat, $lng, $this->defaultRadius)
+        // Use same filtering approach for SQLite compatibility
+        $currentDisasters = $this->getNearbyActiveDisasters($lat, $lng, $this->defaultRadius)
             ->whereBetween('created_at', [$currentPeriodStart, $now])
             ->count();
 
-        $previousDisasters = Disaster::active()
-            ->withinRadius($lat, $lng, $this->defaultRadius)
+        $previousDisasters = $this->getNearbyActiveDisasters($lat, $lng, $this->defaultRadius)
             ->whereBetween('created_at', [$previousPeriodStart, $currentPeriodStart])
             ->count();
 

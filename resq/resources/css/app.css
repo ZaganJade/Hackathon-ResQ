@@ -310,6 +310,55 @@
     .gradient-text {
         @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-600;
     }
+
+    /* ============================================
+       Dark Mode Form Components (Login/Register)
+       ============================================ */
+    .dark-label {
+        @apply block text-sm font-medium text-slate-300 mb-1.5;
+    }
+
+    .dark-input {
+        @apply w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500;
+        @apply focus:bg-white/10 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none;
+        @apply transition-all duration-200;
+    }
+
+    .btn-emerald {
+        @apply w-full inline-flex items-center justify-center gap-2 px-6 py-3;
+        @apply bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-full;
+        @apply hover:from-emerald-600 hover:to-green-700 hover:shadow-lg hover:shadow-emerald-500/25;
+        @apply focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-slate-900;
+        @apply active:scale-[0.98] transition-all duration-200;
+    }
+
+    /* Animation Starting State */
+    .opacity-0-start {
+        opacity: 0;
+    }
+
+    /* Animation Delay Utilities */
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+    .delay-600 { animation-delay: 600ms; }
+
+    /* Glow Animation for Buttons */
+    .animate-glow {
+        animation: glowPulse 2s ease-in-out infinite;
+    }
+
+    /* Slide Up Animation */
+    .animate-slide-up {
+        animation: slideUp 500ms ease-out forwards;
+    }
+
+    /* Fade In Animation */
+    .animate-fade-in {
+        animation: fadeIn 400ms ease-out forwards;
+    }
 }
 
 @layer utilities {
