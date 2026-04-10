@@ -1,0 +1,13 @@
+{
+  "datetime": "2026-04-10T14:33:52",
+  "time": "14:33:52",
+  "date": "10-04-2026",
+  "latitude": 1.21,
+  "longitude": 126.43,
+  "latitude_raw": "1,21 LU",
+  "longitude_raw": "126,43 BT",
+  "depth_km": 11.0,
+  "magnitude": 3.0,
+  "location": "Northern Molucca Sea",
+  "status": "Automatic"
+}

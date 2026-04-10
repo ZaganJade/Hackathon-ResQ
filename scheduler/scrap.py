@@ -9,7 +9,7 @@ import requests
 import json
 import re
 import os
-import psycopg2
+import pymysql
 from bs4 import BeautifulSoup
 from datetime import datetime
 from typing import Dict, Any, List, Optional
@@ -435,13 +435,13 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
     try:
         # Get database connection details from environment
         db_host = os.getenv('DB_HOST')
-        db_port = os.getenv('DB_PORT', '5432')
+        db_port = int(os.getenv('DB_PORT', 5432))
         db_name = os.getenv('DB_DATABASE')
         db_user = os.getenv('DB_USERNAME')
         db_password = os.getenv('DB_PASSWORD')
         
         # Connect to database
-        conn = psycopg2.connect(
+        conn = pymysql.connect(
             host=db_host,
             port=db_port,
             database=db_name,
@@ -482,7 +482,6 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
             created_at,
             updated_at
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        RETURNING id;
         """
         
         cursor.execute(insert_query, (
@@ -498,8 +497,9 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
             datetime.now().isoformat(),  # updated_at
         ))
         
-        disaster_id = cursor.fetchone()[0]
         conn.commit()
+
+        disaster_id = cursor.lastrowid
         
         print(f"Earthquake data stored in database with ID: {disaster_id}")
         cursor.close()
@@ -507,7 +507,7 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
         
         return True
         
-    except psycopg2.Error as e:
+    except pymysql.Error as e:
         print(f"Database error: {e}")
         return False
     except Exception as e:
