@@ -277,6 +277,40 @@
                                     </div>
                                 </div>
 
+                                {{-- User Location Tracking --}}
+                                <div class="bg-white/5 border border-white/10 rounded-xl p-4 shadow-sm">
+                                    <label class="flex items-center gap-2 text-sm font-semibold text-white mb-3">
+                                        <div
+                                            class="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center border border-sky-500/20">
+                                            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </div>
+                                        Posisi Anda
+                                    </label>
+                                    <button
+                                        id="track-user-btn"
+                                        onclick="startUserTracking()"
+                                        class="w-full bg-sky-500 hover:bg-sky-600 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98]">
+                                        <span id="track-user-icon">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </span>
+                                        <span id="track-user-text">Lacak Posisi Saya</span>
+                                    </button>
+                                    <p class="text-xs text-slate-500 mt-2 text-center">
+                                        Lihat posisi Anda secara real-time di peta
+                                    </p>
+                                </div>
+
                                 {{-- Disaster Type Filters --}}
                                 <div class="bg-white/5 border border-white/10 rounded-xl p-4 shadow-sm">
                                     <label class="flex items-center gap-2 text-sm font-semibold text-white mb-3">
@@ -574,6 +608,12 @@
             let searchLocationMarker = null;
             let searchRadiusCircle = null;
 
+            // User location tracking variables
+            let userMarker = null;
+            let userAccuracyCircle = null;
+            let userWatchId = null;
+            let isTrackingUser = false;
+
             // Center of Indonesia
             const INDONESIA_CENTER = { lat: -2.5489, lng: 118.0149 };
 
@@ -608,6 +648,35 @@
                 L.control.zoom({
                     position: 'topleft'
                 }).addTo(map);
+
+                // Add "My Location" Button
+                const myLocationControl = L.Control.extend({
+                    options: {
+                        position: 'topleft'
+                    },
+                    onAdd: function() {
+                        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                        container.innerHTML = `
+                            <a href="#" id="map-locate-btn"
+                               class="flex items-center justify-center w-8 h-8 bg-slate-900/90 border border-white/10 rounded-lg hover:bg-sky-500/20 hover:text-sky-400 transition-all duration-200"
+                               style="color: #e2e8f0; font-size: 16px; line-height: 30px;"
+                               title="Pusatkan ke posisi saya">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </a>
+                        `;
+
+                        container.querySelector('#map-locate-btn').addEventListener('click', function(e) {
+                            e.preventDefault();
+                            centerOnUser();
+                        });
+
+                        return container;
+                    }
+                });
+                map.addControl(new myLocationControl());
 
                 // Using Carto Dark Matter base map perfectly suits our slate-950 theme
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -644,6 +713,233 @@
             }
 
             document.addEventListener('DOMContentLoaded', initMap);
+
+            // ============================================
+            // USER LOCATION TRACKING - Real-time Position
+            // ============================================
+
+            function startUserTracking() {
+                if (!navigator.geolocation) {
+                    showNotification('Browser tidak mendukung geolocation', 'error');
+                    return;
+                }
+
+                if (isTrackingUser) {
+                    // Toggle off
+                    stopUserTracking();
+                    return;
+                }
+
+                isTrackingUser = true;
+                updateTrackButtonState();
+
+                // Get initial position with high accuracy
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        updateUserPosition(position);
+                        // Start watching position for real-time updates
+                        userWatchId = navigator.geolocation.watchPosition(
+                            updateUserPosition,
+                            handlePositionError,
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 30000,
+                                maximumAge: 0
+                            }
+                        );
+                        showNotification('Melacak posisi Anda secara real-time', 'success');
+                    },
+                    (error) => {
+                        handlePositionError(error);
+                        isTrackingUser = false;
+                        updateTrackButtonState();
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 30000,
+                        maximumAge: 0
+                    }
+                );
+            }
+
+            function stopUserTracking() {
+                if (userWatchId !== null) {
+                    navigator.geolocation.clearWatch(userWatchId);
+                    userWatchId = null;
+                }
+                isTrackingUser = false;
+                updateTrackButtonState();
+
+                // Remove user marker and accuracy circle
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                    userMarker = null;
+                }
+                if (userAccuracyCircle) {
+                    map.removeLayer(userAccuracyCircle);
+                    userAccuracyCircle = null;
+                }
+
+                showNotification('Pelacakan posisi dihentikan', 'info');
+            }
+
+            function updateUserPosition(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                console.log('User position updated:', { lat, lng, accuracy });
+
+                // Create or update user marker
+                if (!userMarker) {
+                    // Custom user location icon
+                    const userIcon = L.divIcon({
+                        className: 'user-location-marker',
+                        html: `
+                            <div class="user-marker-pulse"></div>
+                            <div class="user-marker-dot"></div>
+                        `,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+
+                    userMarker = L.marker([lat, lng], {
+                        icon: userIcon,
+                        zIndexOffset: 1000 // Keep user marker on top
+                    }).addTo(map);
+
+                    // Bind popup with accuracy info
+                    userMarker.bindPopup(`
+                        <div style="padding: 8px; font-family: system-ui; min-width: 150px;">
+                            <p style="font-weight: 600; margin: 0 0 4px 0; color: #0ea5e9;">Lokasi Anda</p>
+                            <p style="font-size: 12px; color: #64748b; margin: 0;">Akurasi: ±${Math.round(accuracy)} meter</p>
+                            <p style="font-size: 11px; color: #94a3b8; margin: 4px 0 0 0;">
+                                ${new Date().toLocaleTimeString('id-ID')}
+                            </p>
+                        </div>
+                    `);
+                } else {
+                    userMarker.setLatLng([lat, lng]);
+                    // Update popup content
+                    userMarker.setPopupContent(`
+                        <div style="padding: 8px; font-family: system-ui; min-width: 150px;">
+                            <p style="font-weight: 600; margin: 0 0 4px 0; color: #0ea5e9;">Lokasi Anda</p>
+                            <p style="font-size: 12px; color: #64748b; margin: 0;">Akurasi: ±${Math.round(accuracy)} meter</p>
+                            <p style="font-size: 11px; color: #94a3b8; margin: 4px 0 0 0;">
+                                Update: ${new Date().toLocaleTimeString('id-ID')}
+                            </p>
+                        </div>
+                    `);
+                }
+
+                // Create or update accuracy circle
+                if (!userAccuracyCircle) {
+                    userAccuracyCircle = L.circle([lat, lng], {
+                        radius: accuracy,
+                        color: '#0ea5e9',
+                        fillColor: '#0ea5e9',
+                        fillOpacity: 0.15,
+                        weight: 2,
+                        dashArray: '5, 10'
+                    }).addTo(map);
+                } else {
+                    userAccuracyCircle.setLatLng([lat, lng]);
+                    userAccuracyCircle.setRadius(accuracy);
+                }
+
+                // Center map on user if tracking just started or accuracy improved significantly
+                if (accuracy <= 100) {
+                    map.setView([lat, lng], Math.max(map.getZoom(), 14));
+                }
+
+                // Store accurate location
+                storeUserLocation(lat, lng, accuracy);
+            }
+
+            function handlePositionError(error) {
+                let message = 'Gagal mendapatkan lokasi';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = 'Akses lokasi ditolak. Mohon izinkan akses lokasi di browser.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = 'Informasi lokasi tidak tersedia. Pastikan GPS aktif.';
+                        break;
+                    case error.TIMEOUT:
+                        message = 'Waktu permintaan lokasi habis. Coba lagi di area terbuka.';
+                        break;
+                }
+                showNotification(message, 'error');
+            }
+
+            function updateTrackButtonState() {
+                const btn = document.getElementById('track-user-btn');
+                const btnText = document.getElementById('track-user-text');
+                const btnIcon = document.getElementById('track-user-icon');
+
+                if (!btn) return;
+
+                if (isTrackingUser) {
+                    btn.classList.add('bg-rose-500', 'hover:bg-rose-600');
+                    btn.classList.remove('bg-sky-500', 'hover:bg-sky-600');
+                    btnText.textContent = 'Hentikan Tracking';
+                    btnIcon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+                } else {
+                    btn.classList.add('bg-sky-500', 'hover:bg-sky-600');
+                    btn.classList.remove('bg-rose-500', 'hover:bg-rose-600');
+                    btnText.textContent = 'Lacak Posisi Saya';
+                    btnIcon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>';
+                }
+            }
+
+            function storeUserLocation(lat, lng, accuracy) {
+                if (accuracy <= 100) {
+                    const locationData = {
+                        lat: lat,
+                        lng: lng,
+                        accuracy: accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('resq_last_location', JSON.stringify(locationData));
+                }
+            }
+
+            function showNotification(message, type = 'info') {
+                // Simple notification implementation
+                const notification = document.createElement('div');
+                const bgColor = type === 'error' ? 'bg-rose-500' : type === 'success' ? 'bg-emerald-500' : 'bg-sky-500';
+                notification.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-3 rounded-xl shadow-lg z-50 transition-all duration-300 transform translate-y-20 opacity-0`;
+                notification.style.cssText = 'font-size: 14px; max-width: 300px; word-wrap: break-word;';
+                notification.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-y-20', 'opacity-0');
+                }, 10);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.classList.add('translate-y-20', 'opacity-0');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            function centerOnUser() {
+                if (userMarker) {
+                    const latLng = userMarker.getLatLng();
+                    map.setView(latLng, 16);
+                    userMarker.openPopup();
+                } else if (isTrackingUser) {
+                    showNotification('Menunggu data lokasi...', 'info');
+                } else {
+                    showNotification('Aktifkan "Lacak Posisi Saya" terlebih dahulu', 'error');
+                }
+            }
 
             async function loadDisasters() {
                 showLoading();
@@ -750,7 +1046,7 @@
                             </div>
                             <div style="background:rgba(255, 255, 255, 0.05);border:1px solid rgba(255, 255, 255, 0.1);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
                                 <span style="color:#94a3b8">Waktu</span>
-                                <span style="color:#e2e8f0;font-weight:600;font-size:12px">${new Date(props.created_at).toLocaleString('id-ID')}</span>
+                                <span style="color:#e2e8f0;font-weight:600;font-size:12px">${props.datetime ? new Date(props.datetime).toLocaleString('id-ID') : 'N/A'}</span>
                             </div>
                         </div>
                         ${props.description ? `<p style="margin:12px 0 0 0;font-size:12px;color:#cbd5e1;background:rgba(255, 255, 255, 0.05);padding:10px;border-radius:10px;line-height:1.5">${props.description.substring(0, 120)}...</p>` : ''}
@@ -946,6 +1242,9 @@
                     if (searchLocationMarker) { map.removeLayer(searchLocationMarker); searchLocationMarker = null; }
                     if (searchRadiusCircle) { map.removeLayer(searchRadiusCircle); searchRadiusCircle = null; }
 
+                    // Stop user tracking on reset
+                    stopUserTracking();
+
                     map.setView([INDONESIA_CENTER.lat, INDONESIA_CENTER.lng], 5);
                     loadDisasters();
                 });
@@ -953,6 +1252,20 @@
                 document.getElementById('auto-refresh').addEventListener('change', (e) => {
                     if (e.target.checked) startAutoRefresh();
                 });
+
+                // Try to restore user location from storage on load
+                const storedLocation = localStorage.getItem('resq_last_location');
+                if (storedLocation) {
+                    const loc = JSON.parse(storedLocation);
+                    const storedTime = new Date(loc.timestamp);
+                    const now = new Date();
+                    const hoursDiff = (now - storedTime) / (1000 * 60 * 60);
+
+                    // If location is less than 24 hours old, offer to use it
+                    if (hoursDiff < 24) {
+                        console.log('Found stored location:', loc);
+                    }
+                }
             });
         </script>
 
@@ -1064,6 +1377,65 @@
 
         .dark-calendar input[type="date"]::-webkit-calendar-picker-indicator:hover {
             opacity: 0.8;
+        }
+
+        /* User Location Marker - Real-time Tracking */
+        .user-location-marker {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+
+        .user-marker-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(14, 165, 233, 0.3);
+            border: 2px solid #0ea5e9;
+            animation: userPulse 2s ease-out infinite;
+        }
+
+        .user-marker-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            z-index: 10;
+        }
+
+        @keyframes userPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* User accuracy circle animation */
+        .leaflet-interactive[stroke="#0ea5e9"] {
+            animation: circlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes circlePulse {
+            0%, 100% {
+                stroke-opacity: 0.6;
+            }
+            50% {
+                stroke-opacity: 1;
+            }
         }
     </style>
 </x-app-layout>

@@ -103,10 +103,12 @@ class Chatlog extends Model
             ->whereNull('deleted_at')
             ->count();
 
+        // Compatible JSON extraction for MySQL
         $avgResponseTime = static::forUser($userId)
             ->where('role', 'assistant')
-            ->whereRaw("metadata->>'response_time' IS NOT NULL")
-            ->selectRaw("AVG(CAST(metadata->>'response_time' AS DECIMAL(10,3))) as avg_time")
+            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) IS NOT NULL")
+            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) != ''")
+            ->selectRaw("AVG(CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) AS DECIMAL(10,3))) as avg_time")
             ->first()
             ?->avg_time ?? 0;
 
