@@ -1,0 +1,76 @@
+---
+# BMKG Scheduler Deployment (runs continuously, scrapes every N seconds)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bmkg-scheduler
+  namespace: kanarazu-katsu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: scheduler
+          image: zaganjade/bmkg-scheduler:latest
+          imagePullPolicy: Always
+          env:
+            - name: DB_HOST
+              value: "103.185.52.138"
+            - name: DB_PORT
+              value: "1185"
+            - name: DB_DATABASE
+              value: "kanarazu_katsu"
+            - name: DB_USERNAME
+              value: "kanarazu_katsu"
+            - name: DB_PASSWORD
+              value: "3u4m6?V)$J*AFuPZum8ouFWitM039}M7"
+            - name: WEBHOOK_URL
+              value: "https://kanarazu-katsu.hackathon.sev-2.com/api/v1/webhook/whatsapp/broadcast"
+            - name: WEBHOOK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: webhook-secret
+                  key: api-key
+            - name: PREV_DATA_PATH
+              value: "/tmp/prev_data.json"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: RUN_MODE
+              value: "continuous"  # Set to "once" for single run, "continuous" for loop
+            - name: SCRAPE_INTERVAL_SECONDS
+              value: "10"  # Scrape every 10 seconds for near real-time
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: tmp-data
+              mountPath: /tmp
+      volumes:
+        - name: tmp-data
+          persistentVolumeClaim:
+            claimName: scheduler-data-pvc
+---
+# PersistentVolumeClaim for scheduler data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scheduler-data-pvc
+  namespace: kanarazu-katsu
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

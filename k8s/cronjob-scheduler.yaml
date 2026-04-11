@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: bmkg-scheduler
+  namespace: default
+spec:
+  schedule: "*/5 * * * *"  # Run every 5 minutes
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+            - name: regcred
+          containers:
+            - name: scheduler
+              image: zaganjade/bmkg-scheduler:latest
+              imagePullPolicy: Always
+              env:
+                - name: DB_HOST
+                  value: "103.185.52.138"
+                - name: DB_PORT
+                  value: "1185"
+                - name: DB_DATABASE
+                  value: "kanarazu_katsu"
+                - name: DB_USERNAME
+                  value: "kanarazu_katsu"
+                - name: DB_PASSWORD
+                  value: "3u4m6?V)$J*AFuPZum8ouFWitM039}M7"
+                - name: WEBHOOK_URL
+                  value: "https://kanarazu-katsu.hackathon.sev-2.com/api/v1/webhook/whatsapp/broadcast"
+                - name: WEBHOOK_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: webhook-secret
+                      key: api-key
+                      optional: true
+                - name: PREV_DATA_PATH
+                  value: "/tmp/prev_data.json"
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "256Mi"
+                  cpu: "200m"
+              volumeMounts:
+                - name: tmp-data
+                  mountPath: /tmp
+          volumes:
+            - name: tmp-data
+              emptyDir: {}
+          restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-secret
+  namespace: default
+type: Opaque
+stringData:
+  api-key: "resq_webhook_secret_key_2024"

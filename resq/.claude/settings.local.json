@@ -12,7 +12,9 @@
       "Bash(pkill -f \"php artisan serve\")",
       "Bash(taskkill /F /IM php.exe)",
       "Bash(npm run:*)",
-      "Bash(mysql:*)"
+      "Bash(mysql:*)",
+      "Bash(C:/Redis/redis-server.exe:*)",
+      "Bash(net start:*)"
     ]
   }
 }

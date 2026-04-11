@@ -9,15 +9,19 @@ import requests
 import json
 import re
 import os
-import pymysql
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 import asyncio
 
-# Load environment variables
-load_dotenv('../resq/.env')
+# Load environment variables (for local development)
+# In Kubernetes, env vars will be injected directly
+env_path = os.path.join(os.path.dirname(__file__), '../resq/.env')
+if os.path.exists(env_path):
+    load_dotenv(env_path)
 
 class BMKGEarthquakeScraper:
     """Scraper for BMKG earthquake real-time data"""
@@ -140,19 +144,22 @@ class BMKGEarthquakeScraper:
     @staticmethod
     def parse_datetime(date_str: str, time_str: str) -> Optional[str]:
         """
-        Parse date and time strings to ISO format datetime
-        
+        Parse date and time strings to ISO format datetime (WIB)
+        BMKG uses WIB (Waktu Indonesia Barat = UTC+7)
+        Keep as WIB for display to Indonesian users
+
         Args:
             date_str: Date string (e.g., "09-04-2026")
             time_str: Time string (e.g., "01:17:34")
-            
+
         Returns:
-            ISO format datetime string or None
+            ISO format datetime string in WIB (with +07:00 offset) or None
         """
         try:
             datetime_str = f"{date_str} {time_str}"
             dt = datetime.strptime(datetime_str, "%d-%m-%Y %H:%M:%S")
-            return dt.isoformat()
+            # Return as WIB with timezone offset (+07:00)
+            return dt.strftime("%Y-%m-%dT%H:%M:%S+07:00")
         except ValueError:
             return None
     def parse_table(self, html: str) -> List[Dict[str, Any]]:
@@ -427,13 +434,374 @@ class BMKGEarthquakeScraper:
             'data': earthquakes
         }
 
+def get_latest_earthquake_from_db() -> Optional[Dict[str, Any]]:
+    """
+    Get the latest earthquake from database for comparison
+
+    Returns:
+        Dictionary with latest earthquake data or None
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Get latest earthquake by created_at
+        query = """
+        SELECT
+            id, type, location, latitude, longitude, severity, status, source,
+            raw_data, created_at, updated_at
+        FROM disasters
+        WHERE type = 'earthquake'
+        ORDER BY created_at DESC
+        LIMIT 1
+        """
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if result:
+            return dict(result)
+        return None
+
+    except psycopg2.Error as e:
+        print(f"Database error checking latest earthquake: {e}")
+        return None
+    except Exception as e:
+        print(f"Error checking latest earthquake: {e}")
+        return None
+
+
+def earthquake_exists_in_db(earthquake: Dict[str, Any]) -> bool:
+    """
+    Check if earthquake already exists in database
+    Based on datetime + location (latitude/longitude) + magnitude
+
+    Args:
+        earthquake: Earthquake data dictionary
+
+    Returns:
+        True if exists, False otherwise
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor()
+
+        # Check by datetime + coordinates + magnitude (unique combination)
+        query = """
+        SELECT id FROM disasters
+        WHERE type = 'earthquake'
+        AND raw_data->>'datetime' = %s
+        AND ABS(latitude - %s) < 0.001
+        AND ABS(longitude - %s) < 0.001
+        AND raw_data->>'magnitude' = %s
+        LIMIT 1
+        """
+
+        cursor.execute(query, (
+            earthquake.get('datetime'),
+            earthquake.get('latitude'),
+            earthquake.get('longitude'),
+            str(earthquake.get('magnitude'))
+        ))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return result is not None
+
+    except psycopg2.Error as e:
+        print(f"Database error checking existence: {e}")
+        return False
+    except Exception as e:
+        print(f"Error checking earthquake existence: {e}")
+        return False
+
+
+def get_latest_earthquake_from_db() -> Optional[Dict[str, Any]]:
+    """
+    Get the latest earthquake data from database
+
+    Returns:
+        Dictionary with latest earthquake data or None
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Get latest earthquake by created_at
+        query = """
+        SELECT type, location, latitude, longitude, severity, status, raw_data, created_at
+        FROM disasters
+        WHERE type = 'earthquake'
+        ORDER BY created_at DESC
+        LIMIT 1
+        """
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if result:
+            return dict(result)
+        return None
+
+    except Exception as e:
+        print(f"Error getting latest earthquake from DB: {e}")
+        return None
+
+
+def check_earthquake_exists(earthquake: Dict[str, Any]) -> bool:
+    """
+    Check if an earthquake already exists in database
+    Based on datetime, latitude, longitude, and magnitude
+
+    Args:
+        earthquake: Earthquake data dictionary
+
+    Returns:
+        True if exists, False otherwise
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor()
+
+        # Check for existing earthquake with same key fields
+        # Use tolerance for latitude/longitude comparison
+        query = """
+        SELECT id FROM disasters
+        WHERE type = 'earthquake'
+        AND ABS(latitude - %s) < 0.01
+        AND ABS(longitude - %s) < 0.01
+        AND raw_data->>'datetime' = %s
+        LIMIT 1
+        """
+
+        cursor.execute(query, (
+            earthquake.get('latitude'),
+            earthquake.get('longitude'),
+            earthquake.get('datetime')
+        ))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return result is not None
+
+    except Exception as e:
+        print(f"Error checking earthquake existence: {e}")
+        return False
+
+
+def get_latest_earthquake_from_db() -> Optional[Dict[str, Any]]:
+    """
+    Get the latest earthquake data from database
+
+    Returns:
+        Dictionary with latest earthquake data or None
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Get the latest earthquake from database
+        query = """
+        SELECT latitude, longitude, magnitude, depth_km, created_at, raw_data
+        FROM disasters
+        WHERE type = 'earthquake'
+        ORDER BY created_at DESC
+        LIMIT 1
+        """
+
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if result:
+            return {
+                'latitude': float(result['latitude']),
+                'longitude': float(result['longitude']),
+                'magnitude': result['raw_data'].get('magnitude') if isinstance(result['raw_data'], dict) else None,
+                'created_at': result['created_at'].isoformat() if result['created_at'] else None
+            }
+        return None
+
+    except Exception as e:
+        print(f"Error fetching latest earthquake from DB: {e}")
+        return None
+
+def is_earthquake_new(earthquake: Dict[str, Any], db_latest: Optional[Dict[str, Any]]) -> bool:
+    """
+    Check if earthquake is new by comparing with database latest
+
+    Args:
+        earthquake: Current earthquake from BMKG
+        db_latest: Latest earthquake from database
+
+    Returns:
+        True if earthquake is new
+    """
+    if db_latest is None:
+        print("No previous data in database, treating as new")
+        return True
+
+    # Compare key fields
+    lat_match = abs(earthquake.get('latitude', 0) - db_latest.get('latitude', 0)) < 0.01
+    lon_match = abs(earthquake.get('longitude', 0) - db_latest.get('longitude', 0)) < 0.01
+    mag_match = abs(earthquake.get('magnitude', 0) - (db_latest.get('magnitude') or 0)) < 0.1
+
+    is_same = lat_match and lon_match and mag_match
+
+    if is_same:
+        print(f"Earthquake matches latest in DB: lat={db_latest.get('latitude')}, lon={db_latest.get('longitude')}, mag={db_latest.get('magnitude')}")
+        return False
+
+    print(f"New earthquake detected: lat={earthquake.get('latitude')}, lon={earthquake.get('longitude')}, mag={earthquake.get('magnitude')}")
+    print(f"DB latest was: lat={db_latest.get('latitude')}, lon={db_latest.get('longitude')}, mag={db_latest.get('magnitude')}")
+    return True
+
+def check_earthquake_exists(earthquake: Dict[str, Any]) -> bool:
+    """
+    Check if earthquake already exists in database
+
+    Args:
+        earthquake: Earthquake data dictionary
+
+    Returns:
+        True if exists, False otherwise
+    """
+    try:
+        db_host = os.getenv('DB_HOST')
+        db_port = int(os.getenv('DB_PORT', 5432))
+        db_name = os.getenv('DB_DATABASE')
+        db_user = os.getenv('DB_USERNAME')
+        db_password = os.getenv('DB_PASSWORD')
+
+        conn = psycopg2.connect(
+            host=db_host,
+            port=db_port,
+            dbname=db_name,
+            user=db_user,
+            password=db_password
+        )
+
+        cursor = conn.cursor()
+
+        # Check for existing earthquake with same datetime and coordinates
+        # Using 0.01 degree tolerance for coordinates (approx 1km)
+        query = """
+        SELECT id FROM disasters
+        WHERE type = 'earthquake'
+        AND raw_data->>'datetime' = %s
+        AND ABS(latitude - %s) < 0.01
+        AND ABS(longitude - %s) < 0.01
+        AND ABS((raw_data->>'magnitude')::float - %s) < 0.1
+        LIMIT 1
+        """
+
+        cursor.execute(query, (
+            earthquake.get('datetime'),
+            earthquake.get('latitude'),
+            earthquake.get('longitude'),
+            earthquake.get('magnitude')
+        ))
+
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        return result is not None
+
+    except psycopg2.Error as e:
+        print(f"Database error checking existence: {e}")
+        return False
+    except Exception as e:
+        print(f"Error checking earthquake existence: {e}")
+        return False
+
+
 def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
     """
     Store earthquake data to PostgreSQL database
-    
+
     Args:
         earthquake: Earthquake data dictionary
-        
+
     Returns:
         True if successful, False otherwise
     """
@@ -444,21 +812,21 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
         db_name = os.getenv('DB_DATABASE')
         db_user = os.getenv('DB_USERNAME')
         db_password = os.getenv('DB_PASSWORD')
-        
-        # Connect to database
-        conn = pymysql.connect(
+
+        # Connect to PostgreSQL database
+        conn = psycopg2.connect(
             host=db_host,
             port=db_port,
-            database=db_name,
+            dbname=db_name,
             user=db_user,
             password=db_password
         )
-        
+
         cursor = conn.cursor()
-        
+
         # Prepare data for insertion
         severity = BMKGEarthquakeScraper.classify_severity(earthquake.get('magnitude'))
-        
+
         # Build the raw_data JSON
         raw_data = {
             'magnitude': earthquake.get('magnitude'),
@@ -472,23 +840,33 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
             'time': earthquake.get('time'),
             'status': earthquake.get('status'),
         }
-        
-        # Insert into disasters table
+
+        # Insert into disasters table (PostgreSQL syntax)
         insert_query = """
         INSERT INTO disasters (
-            type, 
-            location, 
-            latitude, 
-            longitude, 
-            severity, 
-            status, 
-            source, 
+            type,
+            location,
+            latitude,
+            longitude,
+            severity,
+            status,
+            source,
             raw_data,
             created_at,
             updated_at
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
-        
+
+        # Parse the earthquake datetime for created_at
+        eq_datetime = earthquake.get('datetime')
+        if eq_datetime:
+            # Use the earthquake's actual datetime from BMKG
+            created_at = eq_datetime
+        else:
+            # Fallback to current time if parsing failed
+            created_at = datetime.now().isoformat()
+
         cursor.execute(insert_query, (
             'earthquake',  # type
             earthquake.get('location', 'Unknown'),  # location
@@ -498,21 +876,21 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
             'active',  # status
             'bmkg_api',  # source
             json.dumps(raw_data),  # raw_data as JSON
-            datetime.now().isoformat(),  # created_at
+            created_at,  # created_at - use actual earthquake datetime
             datetime.now().isoformat(),  # updated_at
         ))
-        
+
         conn.commit()
 
-        disaster_id = cursor.lastrowid
-        
+        disaster_id = cursor.fetchone()[0]
+
         print(f"Earthquake data stored in database with ID: {disaster_id}")
         cursor.close()
         conn.close()
-        
+
         return True
-        
-    except pymysql.Error as e:
+
+    except psycopg2.Error as e:
         print(f"Database error: {e}")
         return False
     except Exception as e:
@@ -520,81 +898,101 @@ def store_earthquake_to_database(earthquake: Dict[str, Any]) -> bool:
         return False
 
 
+# Get previous data file path from env
+PREV_DATA_PATH = os.getenv('PREV_DATA_PATH', 'prev_data.json')
+
 scraper = BMKGEarthquakeScraper()
 
 def schedule():
-    """Main entry point"""
-    # print("Starting BMKG Earthquake Scraper...")
-    
+    """Main entry point - optimized for fast detection"""
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting BMKG scrape...")
+
     result = scraper.scrape()
-    
+
     # Check if scraping was successful
     if not result.get('success') or not result.get('data'):
-        print("Failed to fetch earthquake data")
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Failed to fetch earthquake data")
         return result
-    
-    try:
-        with open('prev_data.json', 'r', encoding='utf-8') as f:
-            prev_data = json.load(f)
-    except FileNotFoundError:
-        prev_data = None
-    
-    current_earthquake = result['data'][0]
-    
-    if prev_data is None:
-        print("No previous data found, initializing data...")
-        with open('prev_data.json', 'w', encoding='utf-8') as f:
-            json.dump(current_earthquake, f, indent=2, ensure_ascii=False)
-    else:
-        print("Checking...")
-        # Check if there's new earthquake data
-        is_new_data = (
-            prev_data.get("datetime") != current_earthquake.get("datetime") or
-            prev_data.get("time") != current_earthquake.get("time") or
-            prev_data.get("date") != current_earthquake.get("date") or
-            prev_data.get("latitude") != current_earthquake.get("latitude") or
-            prev_data.get("longitude") != current_earthquake.get("longitude") or
-            prev_data.get("latitude_raw") != current_earthquake.get("latitude_raw") or
-            prev_data.get("longitude_raw") != current_earthquake.get("longitude_raw") or
-            prev_data.get("depth_km") != current_earthquake.get("depth_km") or
-            # prev_data.get("depth_raw") != current_earthquake.get("depth_raw") or
-            prev_data.get("magnitude") != current_earthquake.get("magnitude") or
-            # prev_data.get("magnitude_raw") != current_earthquake.get("magnitude_raw") or
-            prev_data.get("location") != current_earthquake.get("location") or
-            prev_data.get("status") != current_earthquake.get("status")
-        )
-        
-        if is_new_data:
-            print("New earthquake data detected!")
-            
-            # Store to database
-            db_stored = store_earthquake_to_database(current_earthquake)
-            
-            if db_stored:
-                # Send webhook notification
-                webhook_url = os.getenv('WEBHOOK_URL', '/api/v1/webhook/whatsapp/broadcast')
-                webhook_key = os.getenv('WEBHOOK_API_KEY', 'your_webhook_key')
-                
-                scraper.send_webhook_notification(
-                    current_earthquake,
-                    webhook_url,
-                    webhook_key
-                )
-            
-            # Update previous data cache
-            with open('prev_data.json', 'w', encoding='utf-8') as f:
-                json.dump(current_earthquake, f, indent=2, ensure_ascii=False)
-            
-            print("Data cache updated.")
-        else:
-            print("No new earthquake data detected.")
 
-async def main():
-    schedule()
-    while True:
-        await asyncio.sleep(60) # 1 min interval
-        schedule()
+    current_earthquake = result['data'][0]
+    eq_time = current_earthquake.get('time', 'unknown')
+    eq_mag = current_earthquake.get('magnitude', 'unknown')
+    eq_loc = current_earthquake.get('location', 'unknown')[:30]
+
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Latest: M{eq_mag} at {eq_time} - {eq_loc}...")
+
+    # Primary check: Database-based comparison (most reliable)
+    exists_in_db = check_earthquake_exists(current_earthquake)
+
+    if exists_in_db:
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] Already exists in database, skipping")
+        return result
+
+    # New earthquake detected!
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] NEW EARTHQUAKE DETECTED!")
+    print(f"  Time: {current_earthquake.get('datetime')}")
+    print(f"  Magnitude: {current_earthquake.get('magnitude')}")
+    print(f"  Location: {current_earthquake.get('location')}")
+
+    # Store to database immediately
+    db_stored = store_earthquake_to_database(current_earthquake)
+
+    if db_stored:
+        # Send webhook notification
+        webhook_url = os.getenv('WEBHOOK_URL', 'https://kanarazu-katsu.hackathon.sev-2.com/api/v1/webhook/whatsapp/broadcast')
+        webhook_key = os.getenv('WEBHOOK_API_KEY', 'resq_webhook_secret_key_2024')
+
+        scraper.send_webhook_notification(
+            current_earthquake,
+            webhook_url,
+            webhook_key
+        )
+
+    # Update file cache as backup
+    try:
+        with open(PREV_DATA_PATH, 'w', encoding='utf-8') as f:
+            json.dump(current_earthquake, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Warning: Could not update cache file: {e}")
+
+    return result
+
+def main():
+    """Sync main function for CronJob - runs once and exits"""
+    try:
+        result = schedule()
+        if result.get('success'):
+            print(f"Scraped {result.get('count', 0)} earthquakes successfully")
+            return 0
+        else:
+            print(f"Scraping failed: {result.get('error')}")
+            return 1
+    except Exception as e:
+        print(f"Fatal error: {e}")
+        return 1
+
+# Get scrape interval from env (default 10 seconds for near real-time)
+SCRAPE_INTERVAL_SECONDS = int(os.getenv('SCRAPE_INTERVAL_SECONDS', '10'))
+
+def run_continuous():
+    """Continuous mode for real-time scraping"""
+    async def loop():
+        print(f"Starting continuous loop - scraping every {SCRAPE_INTERVAL_SECONDS} seconds")
+        while True:
+            try:
+                schedule()
+            except Exception as e:
+                print(f"Error in schedule: {e}")
+            await asyncio.sleep(SCRAPE_INTERVAL_SECONDS)
+
+    asyncio.run(loop())
 
 if __name__ == '__main__':
-    asyncio.run(main())
+    run_mode = os.getenv('RUN_MODE', 'continuous')  # Default to continuous for K8s
+    if run_mode == 'continuous':
+        print(f"Running in continuous mode ({SCRAPE_INTERVAL_SECONDS}s intervals)")
+        run_continuous()
+    else:
+        # Single run mode - for manual execution or CronJob
+        exit(main())
 
