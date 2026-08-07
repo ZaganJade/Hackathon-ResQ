@@ -13,23 +13,39 @@
                  'bg-gradient-to-r from-rose-600 to-red-500': alertLevel === 'darurat'
              }">
             <div
-                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-center gap-2 relative z-10">
-                <span class="relative flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="{
-                              'bg-green-200': alertLevel === 'aman',
-                              'bg-amber-200': alertLevel === 'waspada',
-                              'bg-rose-200': alertLevel === 'darurat'
-                          }"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5" :class="{
-                              'bg-green-100': alertLevel === 'aman',
-                              'bg-amber-100': alertLevel === 'waspada',
-                              'bg-rose-100': alertLevel === 'darurat'
-                          }"></span>
-                </span>
-                <p class="text-white text-xs sm:text-sm font-medium tracking-wide">
-                    Status Wilayah:
-                    <span class="font-bold" x-text="alertLabel"></span>
-                </p>
+                class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-2 relative z-10">
+                <div class="flex items-center justify-center gap-2 flex-1">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="{
+                                  'bg-green-200': alertLevel === 'aman',
+                                  'bg-amber-200': alertLevel === 'waspada',
+                                  'bg-rose-200': alertLevel === 'darurat'
+                              }"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5" :class="{
+                                  'bg-green-100': alertLevel === 'aman',
+                                  'bg-amber-100': alertLevel === 'waspada',
+                                  'bg-rose-100': alertLevel === 'darurat'
+                              }"></span>
+                    </span>
+                    <p class="text-white text-xs sm:text-sm font-medium tracking-wide">
+                        Status Wilayah:
+                        <span class="font-bold" x-text="alertLabel"></span>
+                    </p>
+                    <span x-show="zoneStatus.nearbyDisasters > 0" class="text-white/80 text-xs">
+                        (<span x-text="zoneStatus.nearbyDisasters"></span> bencana di sekitar)
+                    </span>
+                </div>
+                <button
+                    @click="refreshZoneStatus()"
+                    class="text-white/70 hover:text-white transition-colors text-xs flex items-center gap-1"
+                    :class="{ 'animate-spin': isLocating }"
+                    title="Perbarui status lokasi"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span class="hidden sm:inline">Perbarui</span>
+                </button>
             </div>
             {{-- Shimmer overlay --}}
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"
@@ -711,8 +727,10 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('fluidDashboard', () => ({
-                // Alert system
+                // Alert system - based on user's location
                 alertLevel: 'aman', // 'aman', 'waspada', 'darurat'
+                userLocation: { lat: null, lng: null },
+                isLocating: false,
 
                 get alertLabel() {
                     const labels = { aman: 'Aman (Hijau)', waspada: 'Waspada (Kuning)', darurat: 'Darurat (Merah)' };
@@ -724,6 +742,14 @@
                     totalDisasters: 0,
                     highRisk: 0,
                     safeZones: 0
+                },
+
+                // Location-based zone status
+                zoneStatus: {
+                    status: 'safe', // safe, warning, danger
+                    label: 'Zona Aman',
+                    nearbyDisasters: 0,
+                    maxSeverity: null
                 },
 
                 // Tips carousel
@@ -762,11 +788,142 @@
                     }
                 ],
 
-                init() {
+                async init() {
                     // Auto-slide tips
                     this.tipInterval = setInterval(() => {
                         this.nextTip();
                     }, 6000);
+
+                    // Detect user location first (for accurate zone status)
+                    await this.detectUserLocation();
+
+                    // Fetch real-time disaster stats
+                    await this.fetchStats();
+
+                    // Auto-refresh stats every 1 minute for real-time updates
+                    setInterval(() => {
+                        this.fetchStats();
+                    }, 60000);
+                },
+
+                async detectUserLocation() {
+                    if (!navigator.geolocation) {
+                        console.log('Geolocation not supported');
+                        return null;
+                    }
+
+                    this.isLocating = true;
+
+                    try {
+                        const position = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                enableHighAccuracy: true,
+                                timeout: 10000,
+                                maximumAge: 300000 // 5 minutes cache
+                            });
+                        });
+
+                        this.userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        return this.userLocation;
+                    } catch (error) {
+                        console.error('Location error:', error);
+                        // Try to get saved location from localStorage
+                        const saved = localStorage.getItem('resq_last_accurate_location');
+                        if (saved) {
+                            const loc = JSON.parse(saved);
+                            this.userLocation = { lat: loc.latitude, lng: loc.longitude };
+                            return this.userLocation;
+                        }
+                        return null;
+                    } finally {
+                        this.isLocating = false;
+                    }
+                },
+
+                async fetchZoneStatus() {
+                    // First ensure we have user location
+                    if (!this.userLocation.lat || !this.userLocation.lng) {
+                        await this.detectUserLocation();
+                    }
+
+                    if (!this.userLocation.lat || !this.userLocation.lng) {
+                        // No location available, fallback to national stats
+                        console.log('No location available, using national stats');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/v1/location/analyze', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify({
+                                latitude: this.userLocation.lat,
+                                longitude: this.userLocation.lng
+                            })
+                        });
+
+                        if (!response.ok) throw new Error('Failed to fetch zone analysis');
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const data = result.data;
+
+                            // Update zone status
+                            this.zoneStatus = {
+                                status: data.zone.status,
+                                label: data.zone.label,
+                                nearbyDisasters: data.metrics?.total_nearby_disasters || 0,
+                                maxSeverity: data.metrics?.max_cluster_size || 0
+                            };
+
+                            // Update alert level based on zone status
+                            if (data.zone.status === 'danger') {
+                                this.alertLevel = 'darurat';
+                            } else if (data.zone.status === 'warning') {
+                                this.alertLevel = 'waspada';
+                            } else {
+                                this.alertLevel = 'aman';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Zone analysis error:', error);
+                        // Keep current alert level on error
+                    }
+                },
+
+                async fetchStats() {
+                    try {
+                        // Fetch both national stats and location-based zone status
+                        const [statsResponse] = await Promise.all([
+                            fetch('/api/disasters/stats'),
+                            this.fetchZoneStatus() // This updates alert level based on user's location
+                        ]);
+
+                        const data = await statsResponse.json();
+
+                        // Update stats from API
+                        this.stats.totalDisasters = data.total || 0;
+
+                        // Calculate high risk (critical + high severity) - national stats
+                        const highRiskCount = (data.by_severity?.critical || 0) + (data.by_severity?.high || 0);
+                        this.stats.highRisk = highRiskCount;
+
+                        // Safe zones = total - high risk (areas without high risk disasters)
+                        this.stats.safeZones = Math.max(0, data.total - highRiskCount);
+
+                    } catch (error) {
+                        console.error('Error fetching disaster stats:', error);
+                        // Keep default values on error
+                    }
                 },
 
                 nextTip() {
@@ -784,6 +941,14 @@
                     this.tipInterval = setInterval(() => {
                         this.nextTip();
                     }, 6000);
+                },
+
+                async refreshZoneStatus() {
+                    // Reset user location to force re-detection
+                    this.userLocation = { lat: null, lng: null };
+                    await this.detectUserLocation();
+                    await this.fetchZoneStatus();
+                    await this.fetchStats();
                 }
             }));
         });

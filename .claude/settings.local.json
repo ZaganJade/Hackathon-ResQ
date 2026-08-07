@@ -14,7 +14,18 @@
       "Read(//tmp/**)",
       "Bash(php -r ':*)",
       "Bash(php:*)",
-      "Bash(curl -s -X POST https://api.fireworks.ai/inference/v1/chat/completions -H 'Authorization: Bearer fw_JgHMrZBsvTMdNz2WjvpqKF' -H 'Content-Type: application/json' -d '{:*)"
+      "Bash(curl -s -X POST https://api.fireworks.ai/inference/v1/chat/completions -H 'Authorization: Bearer fw_JgHMrZBsvTMdNz2WjvpqKF' -H 'Content-Type: application/json' -d '{:*)",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/webhook/whatsapp/broadcast -H 'Content-Type: application/json' -H 'X-API-Key: test_api_key_12345' -d '{\"message\": \"Test notifikasi\", \"disaster_type\": \"earthquake\", \"severity\": \"high\"}')",
+      "Bash(curl:*)",
+      "Bash(xargs grep:*)",
+      "Bash(python scrap.py)",
+      "Bash(python3:*)",
+      "Bash(nslookup whats.yobase.me)",
+      "Bash(ping -n 1 172.232.159.46)",
+      "Bash(redis-cli FLUSHDB)",
+      "Bash(redis-cli ping:*)",
+      "Bash(pkill -f \"scrap.py\")",
+      "Bash(../scheduler/venv/Scripts/python.exe:*)"
     ]
   }
 }

@@ -12,7 +12,7 @@
     <!-- Header -->
     <div class="px-6 py-4 bg-white/[0.03] border-b border-white/[0.06] flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -20,7 +20,7 @@
         </div>
         <button
             @click="refreshLocation()"
-            class="text-slate-400 hover:text-emerald-400 transition"
+            class="text-slate-400 hover:text-sky-400 transition"
             :class="{ 'animate-spin': isLoading }"
             title="Refresh lokasi"
         >
@@ -35,7 +35,7 @@
         <!-- Loading State -->
         <div x-show="status === 'loading'" class="text-center py-8">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/[0.05] mb-4">
-                <svg class="animate-spin h-8 w-8 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-8 w-8 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -45,8 +45,8 @@
 
         <!-- Permission Request State -->
         <div x-show="status === 'requesting'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -54,7 +54,7 @@
             <p class="text-slate-300 mb-4">Izinkan akses lokasi untuk mendapatkan peringatan bencana personal</p>
             <button
                 @click="requestLocation()"
-                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition"
+                class="bg-sky-500 text-white px-4 py-2 rounded-lg hover:bg-sky-600 transition"
             >
                 Izinkan Lokasi
             </button>
@@ -72,14 +72,14 @@
             <div class="flex flex-col gap-2">
                 <button
                     @click="requestLocation()"
-                    class="text-emerald-400 hover:underline text-sm"
+                    class="text-sky-400 hover:underline text-sm"
                 >
                     Coba Lagi
                 </button>
                 @if(auth()->check() && auth()->user()->locations()->exists())
                 <button
                     @click="useSavedLocation()"
-                    class="text-sm bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-lg transition"
+                    class="text-sm bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 px-4 py-2 rounded-lg transition"
                 >
                     Gunakan Lokasi Tersimpan
                 </button>
@@ -92,20 +92,20 @@
 
         <!-- Using Saved Location State -->
         <div x-show="status === 'saved'" class="text-center py-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/10 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </div>
             <p class="text-slate-300 mb-2">Menggunakan Lokasi Tersimpan</p>
-            <p class="text-sm text-emerald-400 mb-4" x-text="savedLocationName"></p>
-            <div class="flex justify-center gap-2">
+            <p class="text-sm text-blue-400 mb-4" x-text="savedLocationName"></p>
+            <div class="flex justify-center gap-2 flex-wrap">
                 <a href="{{ route('locations.index') }}" class="text-xs text-slate-400 hover:text-white transition">
                     Kelola Lokasi
                 </a>
                 <span class="text-slate-600">|</span>
-                <button @click="requestLocation()" class="text-xs text-emerald-400 hover:underline">
+                <button @click="requestLocation()" class="text-xs text-blue-400 hover:underline">
                     Gunakan Lokasi Real-time
                 </button>
             </div>
@@ -121,7 +121,7 @@
             <p class="text-slate-300 mb-2" x-text="errorMessage || 'Peringatan lokasi'"></p>
             <button
                 @click="requestLocation()"
-                class="text-emerald-400 hover:underline text-sm"
+                class="text-sky-400 hover:underline text-sm"
             >
                 Coba Lagi
             </button>
@@ -136,11 +136,35 @@
             </div>
             <p class="text-slate-300 mb-2">Gagal mendeteksi lokasi</p>
             <p class="text-sm text-slate-400 mb-4" x-text="errorMessage"></p>
+
+            <!-- Tips untuk akurasi GPS lebih baik -->
+            <div class="bg-slate-800/50 rounded-lg p-3 mb-4 text-left mx-4">
+                <p class="text-xs text-slate-400 mb-2 font-medium">Tips untuk akurasi lebih baik:</p>
+                <ul class="text-xs text-slate-500 space-y-1">
+                    <li class="flex items-start gap-1">
+                        <span class="text-blue-400">•</span>
+                        <span>Pindah ke area terbuka (outdoor)</span>
+                    </li>
+                    <li class="flex items-start gap-1">
+                        <span class="text-blue-400">•</span>
+                        <span>Pastikan WiFi dan Bluetooth aktif (membantu triangulasi)</span>
+                    </li>
+                    <li class="flex items-start gap-1">
+                        <span class="text-blue-400">•</span>
+                        <span>Tunggu 10-30 detik untuk GPS lock</span>
+                    </li>
+                    <li class="flex items-start gap-1">
+                        <span class="text-blue-400">•</span>
+                        <span>Hindari gedung tinggi atau area tertutup</span>
+                    </li>
+                </ul>
+            </div>
+
             <button
                 @click="requestLocation()"
-                class="text-emerald-400 hover:underline text-sm"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition"
             >
-                Coba Lagi
+                Coba Lagi dengan Akurasi Tinggi
             </button>
         </div>
 
@@ -210,6 +234,14 @@
                 </div>
             </div>
 
+            <!-- Location Accuracy Warning -->
+            <div x-show="accuracy && accuracy > 500" class="flex items-center gap-2 text-sm bg-amber-500/10 border border-amber-500/20 rounded-lg p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-amber-200 text-xs">Lokasi tidak akurat (±<span x-text="Math.round(accuracy)"></span>m). Data bencana mungkin tidak tepat.</span>
+            </div>
+
             <!-- Trend -->
             <div class="flex items-center gap-2 text-sm">
                 <span class="text-slate-400">Trend:</span>
@@ -239,7 +271,7 @@
                 <ul class="space-y-1">
                     <template x-for="rec in recommendations.slice(0, 3)" :key="rec">
                         <li class="flex items-start gap-2 text-sm text-slate-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-400 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
                             <span x-text="rec"></span>
@@ -278,12 +310,26 @@
 
     <!-- Footer -->
     <div class="px-6 py-3 bg-white/[0.03] border-t border-white/[0.06]">
-        <a href="{{ route('map.index') }}" class="flex items-center justify-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
-            </svg>
-            Lihat Peta Bencana
-        </a>
+        <div class="flex items-center justify-between gap-2">
+            <button
+                @click="requestLocation()"
+                class="flex items-center gap-2 text-sm text-slate-400 hover:text-sky-400 transition"
+                :class="{ 'animate-pulse': isLoading }"
+                :disabled="isLoading"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span x-text="isLoading ? 'Memperbarui...' : 'Perbarui Lokasi'"></span>
+            </button>
+            <a href="{{ route('map.index') }}" class="flex items-center gap-2 text-sm text-sky-400 hover:text-sky-300 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 7m0 13V7" />
+                </svg>
+                Lihat Peta Bencana
+            </a>
+        </div>
     </div>
 
     <script>
@@ -293,6 +339,7 @@
                 isLoading: false,
                 latitude: null,
                 longitude: null,
+                accuracy: null, // Akurasi lokasi dalam meter
                 zoneStatus: null,
                 zoneLabel: null,
                 warningMessage: '',
@@ -309,6 +356,16 @@
                 savedLocationName: '',
 
                 init() {
+                    // Coba pakai lokasi tersimpan dulu untuk tampilkan data sementara
+                    const stored = this.getStoredLocation();
+                    if (stored) {
+                        this.latitude = stored.latitude;
+                        this.longitude = stored.longitude;
+                        this.accuracy = stored.accuracy;
+                        // Fetch data dengan lokasi tersimpan sementara
+                        this.fetchZoneAnalysis();
+                    }
+
                     // Check if geolocation is available
                     if (!navigator.geolocation) {
                         // Try to use saved location as fallback
@@ -316,17 +373,33 @@
                         return;
                     }
 
-                    // Try to get location on init
+                    // Request lokasi akurat dari GPS (akan update data jika berhasil)
                     this.requestLocation();
+
+                    // Auto-refresh zone analysis every 1 minute for real-time updates
+                    setInterval(() => {
+                        this.refreshLocation();
+                    }, 60000);
                 },
 
                 async requestLocation() {
                     this.status = 'loading';
+                    this.accuracy = null; // Reset akurasi saat request baru
 
                     try {
                         const position = await this.getCurrentPosition();
                         this.latitude = position.coords.latitude;
                         this.longitude = position.coords.longitude;
+                        this.accuracy = position.coords.accuracy; // Simpan akurasi dalam meter
+
+                        console.log('Lokasi diperbarui:', {
+                            lat: this.latitude,
+                            lng: this.longitude,
+                            accuracy: this.accuracy
+                        });
+
+                        // Simpan lokasi akurat ke localStorage untuk fallback
+                        this.saveAccurateLocation();
 
                         await this.fetchZoneAnalysis();
                         this.status = 'active';
@@ -335,16 +408,64 @@
                     }
                 },
 
+                // Simpan lokasi dengan akurasi tinggi ke localStorage
+                saveAccurateLocation() {
+                    if (this.accuracy && this.accuracy <= 100) { // Hanya simpan jika akurasi <= 100m
+                        const locationData = {
+                            latitude: this.latitude,
+                            longitude: this.longitude,
+                            accuracy: this.accuracy,
+                            timestamp: new Date().toISOString()
+                        };
+                        localStorage.setItem('resq_last_accurate_location', JSON.stringify(locationData));
+                    }
+                },
+
+                // Ambil lokasi tersimpan dari localStorage sebagai fallback
+                getStoredLocation() {
+                    try {
+                        const stored = localStorage.getItem('resq_last_accurate_location');
+                        if (stored) {
+                            const data = JSON.parse(stored);
+                            // Cek apakah data masih valid (kurang dari 24 jam)
+                            const storedTime = new Date(data.timestamp);
+                            const now = new Date();
+                            const hoursDiff = (now - storedTime) / (1000 * 60 * 60);
+
+                            if (hoursDiff < 24 && data.accuracy <= 100) {
+                                return data;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error reading stored location:', e);
+                    }
+                    return null;
+                },
+
                 async useSavedLocation() {
                     this.status = 'loading';
                     this.tryUseSavedLocation();
                 },
 
                 tryUseSavedLocation() {
-                    // Check if user has saved locations (passed from backend)
+                    // Coba pakai lokasi dari localStorage dulu (lebih akurat dan fresh)
+                    const stored = this.getStoredLocation();
+                    if (stored) {
+                        this.latitude = stored.latitude;
+                        this.longitude = stored.longitude;
+                        this.accuracy = stored.accuracy;
+                        this.savedLocationName = 'Lokasi Tersimpan (Akurat)';
+                        this.fetchZoneAnalysis().then(() => {
+                            this.status = 'saved';
+                        });
+                        return;
+                    }
+
+                    // Fallback ke lokasi tersimpan di database jika ada
                     @if(auth()->check() && $defaultLocation = auth()->user()->locations()->where('is_default', true)->first())
                         this.latitude = {{ $defaultLocation->latitude }};
                         this.longitude = {{ $defaultLocation->longitude }};
+                        this.accuracy = null; // Tidak tahu akurasi lokasi tersimpan
                         this.savedLocationName = '{{ $defaultLocation->name }}';
                         this.fetchZoneAnalysis().then(() => {
                             this.status = 'saved';
@@ -357,6 +478,7 @@
                 async refreshLocation() {
                     if (this.isLoading) return;
                     this.isLoading = true;
+                    this.accuracy = null; // Reset akurasi saat refresh
                     await this.requestLocation();
                     this.isLoading = false;
                 },
@@ -365,8 +487,8 @@
                     return new Promise((resolve, reject) => {
                         navigator.geolocation.getCurrentPosition(resolve, reject, {
                             enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 60000 // 1 minute cache for widget
+                            timeout: 30000, // 30 detik untuk akurasi GPS lebih tinggi
+                            maximumAge: 0 // Selalu ambil lokasi fresh, tanpa cache
                         });
                     });
                 },
@@ -380,12 +502,34 @@
                             this.tryUseSavedLocation();
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            this.status = 'error';
-                            this.errorMessage = 'Informasi lokasi tidak tersedia';
+                            // Coba pakai lokasi tersimpan jika ada
+                            const stored = this.getStoredLocation();
+                            if (stored) {
+                                this.latitude = stored.latitude;
+                                this.longitude = stored.longitude;
+                                this.accuracy = stored.accuracy;
+                                this.fetchZoneAnalysis().then(() => {
+                                    this.status = 'active';
+                                });
+                            } else {
+                                this.status = 'error';
+                                this.errorMessage = 'Informasi lokasi tidak tersedia. Aktifkan GPS untuk hasil lebih akurat.';
+                            }
                             break;
                         case error.TIMEOUT:
-                            this.status = 'error';
-                            this.errorMessage = 'Waktu permintaan lokasi habis';
+                            // Coba pakai lokasi tersimpan jika timeout
+                            const cached = this.getStoredLocation();
+                            if (cached) {
+                                this.latitude = cached.latitude;
+                                this.longitude = cached.longitude;
+                                this.accuracy = cached.accuracy;
+                                this.fetchZoneAnalysis().then(() => {
+                                    this.status = 'active';
+                                });
+                            } else {
+                                this.status = 'error';
+                                this.errorMessage = 'Waktu permintaan lokasi habis. Pastikan sinyal GPS bagus atau coba di area terbuka.';
+                            }
                             break;
                         default:
                             this.status = 'error';
@@ -429,6 +573,11 @@
                             this.recommendations = data.recommendations || [];
                             this.nearbyDisasters = data.nearby_disasters || [];
                             this.lastUpdated = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                            // Update lokasi tersimpan jika akurasi bagus
+                            if (this.accuracy && this.accuracy <= 100) {
+                                this.saveAccurateLocation();
+                            }
                         }
                     } catch (error) {
                         console.error('Zone analysis error:', error);

@@ -51,14 +51,14 @@ class MapController extends Controller
             'radius' => 'nullable|numeric|min:1|max:500',
         ]);
 
-        $query = Disaster::query();
+        $query = Disaster::active();
 
         // Filter by types
         if (!empty($validated['types'])) {
             $query->whereIn('type', $validated['types']);
         }
 
-        // Filter by severity (now supports multiple like types)
+        // Filter by severity
         if (!empty($validated['severity'])) {
             $query->whereIn('severity', $validated['severity']);
         }
@@ -100,6 +100,10 @@ class MapController extends Controller
                     'color' => $this->geoService->getSeverityColor($disaster->severity),
                     'created_at' => $disaster->created_at?->toIso8601String(),
                     'updated_at' => $disaster->updated_at?->toIso8601String(),
+                    // Use actual earthquake datetime from raw_data (BMKG source time)
+                    'datetime' => $disaster->raw_data['datetime'] ?? $disaster->created_at?->toIso8601String(),
+                    'magnitude' => $disaster->raw_data['magnitude'] ?? null,
+                    'depth_km' => $disaster->raw_data['depth_km'] ?? null,
                 ],
             ];
         });
@@ -181,7 +185,8 @@ class MapController extends Controller
      */
     public function getStats(): JsonResponse
     {
-        $stats = Disaster::selectRaw('type, severity, COUNT(*) as count')
+        $stats = Disaster::active()
+            ->selectRaw('type, severity, COUNT(*) as count')
             ->groupBy('type', 'severity')
             ->get()
             ->groupBy('type')
@@ -192,14 +197,15 @@ class MapController extends Controller
                 ];
             });
 
-        $totalBySeverity = Disaster::selectRaw('severity, COUNT(*) as count')
+        $totalBySeverity = Disaster::active()
+            ->selectRaw('severity, COUNT(*) as count')
             ->groupBy('severity')
             ->pluck('count', 'severity');
 
         return response()->json([
             'by_type' => $stats,
             'by_severity' => $totalBySeverity,
-            'total' => Disaster::count(),
+            'total' => Disaster::active()->count(),
         ]);
     }
 }

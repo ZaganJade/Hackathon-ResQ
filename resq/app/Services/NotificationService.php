@@ -15,13 +15,15 @@ class NotificationService
 {
     private string $apiUrl;
     private string $apiToken;
+    private string $senderNumber;
     private int $maxRetries = 3;
     private int $rateLimit = 20; // messages per minute
 
     public function __construct()
     {
-        $this->apiUrl   = config('services.whatsapp.api_url', '');
-        $this->apiToken = config('services.whatsapp.api_token', '');
+        $this->apiUrl       = config('services.whatsapp.api_url', '');
+        $this->apiToken     = config('services.whatsapp.api_token', '');
+        $this->senderNumber = config('services.whatsapp.sender_number', '');
     }
 
     // ----------------------------------------------------------------
@@ -33,26 +35,43 @@ class NotificationService
      *
      * @return array{success: bool, message_id: string|null, error: string|null}
      */
-    public function sendMessage(string $phoneNumber, string $message): array
+    public function sendMessage(string $phoneNumber, string $message, int $attempt = 1): array
     {
         try {
-            $response = Http::withToken($this->apiToken)
-                ->timeout(15)
-                ->retry($this->maxRetries, 0, function (\Exception $e, \Illuminate\Http\Client\Response $response = null) {
-                    // Only retry on server-side errors, not 4xx
-                    return $response && $response->serverError();
+            // Use config timeout (default 30s) with longer connect timeout for DNS resolving
+            $timeout = config('services.whatsapp.timeout', 30);
+
+            $response = Http::timeout($timeout)
+                ->connectTimeout(20) // Allow up to 20s for DNS/connect
+                ->retry(3, 2000, function ($exception, $request) {
+                    // Retry on connection/DNS errors
+                    return $exception instanceof \Illuminate\Http\Client\ConnectionException;
                 })
+                ->withHeaders([
+                    'X-Api-Key' => $this->apiToken,
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Host' => 'whats.yobase.me', // Required when using IP address directly
+                ])
                 ->post($this->apiUrl . '/send', [
-                    'phone'   => $phoneNumber,
-                    'message' => $message,
+                    'session_id' => $this->senderNumber,
+                    'to'         => $phoneNumber,
+                    'message'    => $message,
                 ]);
 
             if ($response->successful()) {
                 return [
                     'success'    => true,
-                    'message_id' => $response->json('id'),
+                    'message_id' => $response->json('data.id'), // Yobase returns id in data object
                     'error'      => null,
                 ];
+            }
+
+            // Retry on server errors (5xx) if we haven't exceeded max retries
+            if ($response->serverError() && $attempt < $this->maxRetries) {
+                // Exponential backoff: 0.5s, 1s, 2s
+                usleep(500 * (2 ** ($attempt - 1)) * 1000);
+                return $this->sendMessage($phoneNumber, $message, $attempt + 1);
             }
 
             return [
@@ -60,8 +79,14 @@ class NotificationService
                 'message_id' => null,
                 'error'      => 'HTTP ' . $response->status() . ': ' . $response->body(),
             ];
-        } catch (\Exception $e) {
-            Log::error('WhatsApp API error', ['error' => $e->getMessage(), 'phone' => $phoneNumber]);
+        } catch (\Throwable $e) {
+            Log::error('WhatsApp API error', ['error' => $e->getMessage(), 'phone' => $phoneNumber, 'attempt' => $attempt]);
+
+            // Retry on network errors if we haven't exceeded max retries
+            if ($attempt < $this->maxRetries) {
+                usleep(500 * (2 ** ($attempt - 1)) * 1000);
+                return $this->sendMessage($phoneNumber, $message, $attempt + 1);
+            }
 
             return [
                 'success'    => false,
@@ -215,12 +240,11 @@ MSG;
     /**
      * Trigger notifications to all eligible users for a new disaster.
      * Uses proximity filtering and rate-limiting.
+     * Sends notification for ALL severity levels (low, medium, high, critical).
      */
     public function notifyForDisaster(Disaster $disaster): void
     {
-        if (!in_array($disaster->severity, ['high', 'critical'])) {
-            return; // Only alert for high / critical severity
-        }
+        // Send notification for ALL severity levels
 
         $message = $this->buildDisasterMessage($disaster);
 
@@ -283,7 +307,7 @@ MSG;
     /**
      * Create a NotificationLog entry.
      */
-    public function createLog(int $userId, string $phone, string $message): NotificationLog
+    public function createLog(?int $userId, string $phone, string $message): NotificationLog
     {
         return NotificationLog::create([
             'user_id'      => $userId,

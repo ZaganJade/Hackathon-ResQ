@@ -23,8 +23,9 @@ class SendWhatsAppNotificationJob implements ShouldQueue
 
     /**
      * Timeout in seconds.
+     * Must be longer than WhatsApp API timeout (60s) to allow proper error handling.
      */
-    public int $timeout = 30;
+    public int $timeout = 75;
 
     public function __construct(public readonly NotificationLog $notificationLog)
     {

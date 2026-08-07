@@ -113,24 +113,15 @@ class CheckLocationRiskCommand extends Command
             $message .= "- {$rec}\n";
         }
 
-        // Send WhatsApp notification if user has phone
+        // Create notification log and dispatch job to send WhatsApp notification
         if ($user->phone) {
-            try {
-                $this->notificationService->sendWhatsApp($user->phone, $message);
-                $this->info("  WhatsApp notification sent to {$user->phone}");
-            } catch (\Throwable $e) {
-                $this->error("  Failed to send WhatsApp: {$e->getMessage()}");
-            }
+            $log = $this->notificationService->createLog(
+                $user->id,
+                $user->phone,
+                $title . "\n\n" . $message
+            );
+            \App\Jobs\SendWhatsAppNotificationJob::dispatch($log);
+            $this->info("  WhatsApp notification queued for {$user->phone}");
         }
-
-        // Log the notification
-        \App\Models\NotificationLog::create([
-            'user_id' => $user->id,
-            'channel' => 'whatsapp',
-            'type' => $status === LocationRiskService::STATUS_DANGER ? 'danger_alert' : 'warning_alert',
-            'title' => $title,
-            'message' => $message,
-            'status' => 'pending',
-        ]);
     }
 }
