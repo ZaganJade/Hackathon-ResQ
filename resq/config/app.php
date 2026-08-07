@@ -127,4 +127,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Scheduler Cron Secret
+    |--------------------------------------------------------------------------
+    |
+    | Vercel's serverless functions can't run a long-lived `schedule:work`
+    | process, so an external cron (Vercel Cron Jobs, cron-job.org, etc.)
+    | hits routes/api.php's /v1/cron/run-scheduler endpoint instead. This
+    | token guards that endpoint against unauthenticated triggering.
+    |
+    */
+
+    'cron_secret' => env('CRON_SECRET'),
+
 ];

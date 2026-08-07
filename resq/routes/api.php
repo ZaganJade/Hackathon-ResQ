@@ -62,3 +62,16 @@ Route::get('/health', function () {
         'timestamp' => now()->toIso8601String(),
     ]);
 })->name('api.health');
+
+// Scheduler trigger for external cron services (Vercel has no long-running
+// worker to run `schedule:work`, so an external cron hits this instead).
+Route::get('/v1/cron/run-scheduler', function (\Illuminate\Http\Request $request) {
+    $secret = (string) config('app.cron_secret');
+
+    abort_if($secret === '', 404);
+    abort_unless(hash_equals($secret, (string) $request->query('token')), 403);
+
+    \Illuminate\Support\Facades\Artisan::call('schedule:run');
+
+    return response()->json(['status' => 'ok', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+})->name('api.cron.run-scheduler');
