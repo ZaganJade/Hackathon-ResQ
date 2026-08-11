@@ -43,14 +43,14 @@ class FireworksService extends BaseApiClient
     {
         $config = config('services.fireworks');
 
-        $this->baseUrl = 'https://api.fireworks.ai/inference/v1';
+        $this->baseUrl = $config['base_url'] ?? 'https://zaganrouter.vibedev.web.id/v1';
         $this->apiKey = $config['api_key'] ?? null;
         $this->timeout = $config['timeout'] ?? 30;
         $this->maxRetries = $config['max_retries'] ?? 3;
         $this->retryDelay = $config['retry_delay'] ?? 1000;
         $this->retryMultiplier = 2.0;
 
-        $this->model = $config['model'] ?? 'accounts/fireworks/models/llama-v3p1-70b-instruct';
+        $this->model = $config['model'] ?? 'MINIMAX/MiniMax-M3';
         $this->maxTokens = config('resq.ai_max_tokens', 1024);
         $this->temperature = config('resq.ai_temperature', 0.7);
         $this->systemPrompt = config('resq.ai_system_prompt');

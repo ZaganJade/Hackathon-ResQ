@@ -73,11 +73,12 @@ return [
     */
 
     'fireworks' => [
-        'api_key' => env('FIREWORKS_API_KEY'),
-        'timeout' => env('FIREWORKS_TIMEOUT', 30),
-        'max_retries' => env('FIREWORKS_MAX_RETRIES', 3),
-        'retry_delay' => env('FIREWORKS_RETRY_DELAY', 1000),
-        'model' => env('FIREWORKS_MODEL', 'accounts/fireworks/routers/kimi-k2p5-turbo'),
+        'api_key' => env('LLM_API_KEY'),
+        'base_url' => env('LLM_API_ENDPOINT', 'https://zaganrouter.vibedev.web.id/v1'),
+        'timeout' => env('LLM_TIMEOUT', 30),
+        'max_retries' => env('LLM_MAX_RETRIES', 3),
+        'retry_delay' => env('LLM_RETRY_DELAY', 1000),
+        'model' => env('LLM_MODEL', 'MINIMAX/MiniMax-M3'),
     ],
 
     /*

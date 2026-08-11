@@ -135,35 +135,35 @@
                         <p class="text-slate-400 mt-4 text-sm">Ada yang bisa saya bantu?</p>
                     </div>
                 </div>
-                <form id="chatForm" class="flex items-start gap-3">
-                    <div class="flex-1 relative">
-                        <textarea
-                            id="messageInput"
-                            rows="1"
-                            class="w-full resize-none rounded-2xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/30 px-5 py-3.5 pr-14 text-sm text-white placeholder-slate-500 transition-all duration-200"
-                            placeholder="Ketik pesan Anda di sini..."
-                            maxlength="2000"
-                        ></textarea>
-                        <div class="absolute right-4 bottom-3.5 text-[10px] text-slate-500 font-mono">
-                            <span id="charCount">0</span>/2K
-                        </div>
-                    </div>
-                    <button type="submit" id="sendButton"
-                            class="px-5 py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-2xl hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold text-sm shadow-md">
-                        <span id="sendText" class="hidden sm:inline">Kirim</span>
-                        <svg id="sendIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        <svg id="loadingIcon" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </button>
-                </form>
             </div>
 
             {{-- Input Area — Fixed Bottom --}}
             <div class="flex-shrink-0 glass-dark border-t border-white/5">
                 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-                    {{-- <div class="flex items-center justify-between mt-2 px-1">
+                    <form id="chatForm" class="flex items-start gap-3">
+                        <div class="flex-1 relative">
+                            <textarea
+                                id="messageInput"
+                                rows="1"
+                                class="w-full resize-none rounded-2xl border border-white/10 bg-white/5 focus:bg-white/10 ring-0 focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/30 px-5 py-3.5 pr-14 text-sm text-white placeholder-slate-500 transition-all duration-200"
+                                placeholder="Ketik pesan Anda di sini..."
+                                maxlength="2000"
+                            ></textarea>
+                            <div class="absolute right-4 bottom-3.5 text-[10px] text-slate-500 font-mono">
+                                <span id="charCount">0</span>/2K
+                            </div>
+                        </div>
+                        <button type="submit" id="sendButton"
+                                class="px-5 py-3.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-2xl hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:scale-[1.02] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-semibold text-sm shadow-md">
+                            <span id="sendText" class="hidden sm:inline">Kirim</span>
+                            <svg id="sendIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            <svg id="loadingIcon" class="animate-spin h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                    <div class="flex items-center justify-between mt-2 px-1">
                         <span class="text-[10px] text-slate-500">Enter kirim · Shift+Enter baris baru</span>
                         <div id="conversationInfo" class="flex items-center gap-1.5 text-[10px] text-slate-500">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -173,7 +173,7 @@
                                 · <span id="responseTimeValue" class="text-emerald-400 font-medium">-</span>s
                             </span>
                         </div>
-                    </div> --}}
+                    </div>
                 </div>
             </div>
         </div>
@@ -195,7 +195,7 @@
             const errorText = document.getElementById('errorText');
             const dismissError = document.getElementById('dismissError');
             const newChatBtn = document.getElementById('newChatBtn');
-            // const conversationIdEl = document.getElementById('conversationId');
+            const conversationIdEl = document.getElementById('conversationId');
             const responseTimeEl = document.getElementById('responseTime');
             const responseTimeValue = document.getElementById('responseTimeValue');
             const charCount = document.getElementById('charCount');
@@ -241,7 +241,12 @@
                 }
             }
 
-            generateNewConversation();
+            const urlConversationId = new URLSearchParams(window.location.search).get('conversation');
+            if (urlConversationId) {
+                loadConversation(urlConversationId);
+            } else {
+                generateNewConversation();
+            }
 
             messageInput.addEventListener('input', function() {
                 this.style.height = 'auto';
@@ -304,7 +309,7 @@
                     if (data.success) {
                         addMessage('assistant', data.reply);
                         conversationId = data.conversation_id;
-                        // conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
+                        conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                         if (data.response_time) {
                             responseTimeEl.classList.remove('hidden');
                             responseTimeValue.textContent = data.response_time;
@@ -319,7 +324,7 @@
                 }
             });
 
-            function addMessage(role, content) {
+            function addMessage(role, content, timestamp = new Date()) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'flex items-start gap-3 animate-fade-up';
 
@@ -339,8 +344,8 @@
                         <div class="w-10 h-10 rounded-2xl ${avatarClass} flex items-center justify-center shadow-md">${avatarIcon}</div>
                     </div>
                     <div class="flex-1 ${bubbleClass} p-4 border shadow-soft">
-                        <div class="prose prose-sm max-w-none text-slate-300 leading-relaxed">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
-                        <div class="mt-2 text-[10px] text-slate-500 font-medium">${formatTime(new Date())}</div>
+                        <div class="prose prose-sm max-w-none text-slate-300 leading-relaxed">${renderMessageContent(content)}</div>
+                        <div class="mt-2 text-[10px] text-slate-500 font-medium">${formatTime(timestamp)}</div>
                     </div>
                 `;
 
@@ -372,8 +377,32 @@
 
             function generateNewConversation() {
                 conversationId = 'conv_' + Math.random().toString(36).substring(2, 18);
-                // conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
+                conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                 responseTimeEl.classList.add('hidden');
+            }
+
+            async function loadConversation(id) {
+                conversationId = id;
+                conversationIdEl.textContent = id.substring(0, 12) + '…';
+                responseTimeEl.classList.add('hidden');
+                chatMessages.innerHTML = '';
+
+                try {
+                    const url = '{{ route("ai-assist.conversation", ["conversationId" => "CONV_ID_PLACEHOLDER"]) }}'
+                        .replace('CONV_ID_PLACEHOLDER', encodeURIComponent(id));
+                    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.error || 'Percakapan tidak ditemukan.');
+                    }
+
+                    data.messages.forEach((msg) => addMessage(msg.role, msg.message, new Date(msg.created_at)));
+                } catch (error) {
+                    showError(error.message || 'Gagal memuat percakapan.');
+                    generateNewConversation();
+                    clearMessages();
+                }
             }
 
             function clearMessages() {
@@ -397,10 +426,8 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+            function renderMessageContent(content) {
+                return DOMPurify.sanitize(marked.parse(content));
             }
 
             function formatTime(date) {
