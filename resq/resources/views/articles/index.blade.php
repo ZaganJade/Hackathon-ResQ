@@ -232,46 +232,26 @@
 
                             <div class="mt-8">{{ $articles->links() }}</div>
                         @else
-                            {{-- Sample Articles --}}
-                            @php
-                                $sampleArticles = [
-                                    ['title' => 'Cara Menyusun Rencana Evakuasi Keluarga yang Efektif', 'excerpt' => 'Rencana evakuasi yang baik dapat menyelamatkan nyawa saat bencana terjadi.', 'category' => 'Kesiapsiagaan', 'gradient' => 'from-emerald-500/20 to-green-500/10'],
-                                    ['title' => 'Mengenal Tanda-Tanda Gempa Bumi dan Tindakan Pertama', 'excerpt' => 'Memahami tanda-tanda awal gempa bumi sangat penting untuk keselamatan.', 'category' => 'Respons Darurat', 'gradient' => 'from-amber-500/20 to-orange-500/10'],
-                                    ['title' => 'Persiapan Pasca Bencana: Memulihkan Kehidupan', 'excerpt' => 'Proses pemulihan pasca bencana membutuhkan perencanaan matang.', 'category' => 'Pemulihan', 'gradient' => 'from-emerald-500/20 to-green-500/10'],
-                                    ['title' => 'Teknologi Modern dalam Mitigasi Bencana', 'excerpt' => 'Dari sistem peringatan dini hingga aplikasi darurat.', 'category' => 'Mitigasi', 'gradient' => 'from-purple-500/20 to-indigo-500/10'],
-                                    ['title' => 'Edukasi Bencana untuk Anak: Cara yang Tepat', 'excerpt' => 'Menyampaikan informasi bencana kepada anak membutuhkan pendekatan khusus.', 'category' => 'Edukasi', 'gradient' => 'from-rose-500/20 to-pink-500/10'],
-                                    ['title' => 'Membangun Rumah Tahan Gempa: Panduan Dasar', 'excerpt' => 'Struktur bangunan yang tepat dapat mengurangi risiko kerusakan.', 'category' => 'Mitigasi', 'gradient' => 'from-teal-500/20 to-cyan-500/10'],
-                                ];
-                            @endphp
-                            <div class="grid gap-5 md:grid-cols-2">
-                                @foreach($sampleArticles as $index => $article)
-                                    <article class="glass-dark border border-white/5 rounded-2xl shadow-soft overflow-hidden group hover:border-emerald-500/20 transition-all duration-300" data-aos="zoom-in-up" data-aos-delay="{{ $index * 100 }}">
-                                        <div class="h-36 bg-gradient-to-br {{ $article['gradient'] }} relative flex items-center justify-center overflow-hidden border-b border-white/5">
-                                            <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                                            <span class="absolute top-3 left-3 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold text-white border border-white/20">{{ $article['category'] }}</span>
-                                        </div>
-                                        <div class="p-5">
-                                            <div class="flex items-center gap-3 text-xs text-slate-500 mb-3">
-                                                <span>{{ now()->format('d M Y') }}</span>
-                                                <span class="w-1 h-1 rounded-full bg-slate-600"></span>
-                                                <span>{{ rand(100, 1000) }} dibaca</span>
-                                            </div>
-                                            <h2 class="text-base font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors line-clamp-2">{{ $article['title'] }}</h2>
-                                            <p class="text-slate-400 text-sm line-clamp-2 mb-4">{{ $article['excerpt'] }}</p>
-                                            <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center">
-                                                        <span class="text-[10px] font-bold text-white">R</span>
-                                                    </div>
-                                                    <span class="text-xs text-slate-500 font-medium">ResQ Admin</span>
-                                                </div>
-                                                <a href="#" class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
-                                                    Baca <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </article>
-                                @endforeach
+                            <div class="text-center py-16 glass-dark rounded-2xl shadow-soft border border-white/5" data-aos="fade-up">
+                                <div class="w-20 h-20 mx-auto mb-4 bg-slate-800 rounded-2xl flex items-center justify-center border border-white/5 shadow-inner">
+                                    <svg class="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-white mb-2">Belum ada artikel</h3>
+                                <p class="text-slate-400 mb-4">
+                                    @if($searchQuery ?? null)
+                                        Tidak ada artikel yang cocok dengan pencarian "{{ $searchQuery }}".
+                                    @elseif($currentCategory ?? null)
+                                        Belum ada artikel dalam kategori ini.
+                                    @else
+                                        Belum ada artikel yang dipublikasikan.
+                                    @endif
+                                </p>
+                                @if(($searchQuery ?? null) || ($currentCategory ?? null))
+                                    <a href="{{ route('articles.index') }}" class="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-full text-sm font-bold shadow-lg shadow-white\10 hover:bg-slate-100 hover:scale-[1.02] transition-all duration-300 active:scale-[0.98]">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                                        Lihat semua artikel
+                                    </a>
+                                @endif
                             </div>
                         @endif
                     </div>
