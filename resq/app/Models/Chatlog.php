@@ -103,14 +103,15 @@ class Chatlog extends Model
             ->whereNull('deleted_at')
             ->count();
 
-        // Compatible JSON extraction for MySQL
+        // Averaged in PHP rather than via JSON_EXTRACT/JSON_UNQUOTE SQL (MySQL-only
+        // syntax that doesn't exist on Postgres) so this works across DB drivers.
         $avgResponseTime = static::forUser($userId)
             ->where('role', 'assistant')
-            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) IS NOT NULL")
-            ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) != ''")
-            ->selectRaw("AVG(CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.response_time')) AS DECIMAL(10,3))) as avg_time")
-            ->first()
-            ?->avg_time ?? 0;
+            ->whereNotNull('metadata')
+            ->pluck('metadata')
+            ->map(fn ($metadata) => $metadata['response_time'] ?? null)
+            ->filter(fn ($value) => is_numeric($value))
+            ->avg() ?? 0;
 
         $firstConversation = static::forUser($userId)
             ->min('created_at');
