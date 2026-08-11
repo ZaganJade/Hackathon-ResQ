@@ -53,9 +53,11 @@
             </div>
         </footer>
 
-        <!-- AI Chatbot Floating Widget -->
+        <!-- AI Chatbot Floating Widget (hidden on /ai-assist itself, which already is the chat interface) -->
         @auth
-            <x-ai-chatbot />
+            @unless(request()->routeIs('ai-assist.index'))
+                <x-ai-chatbot />
+            @endunless
         @endauth
 
         @stack('scripts')
