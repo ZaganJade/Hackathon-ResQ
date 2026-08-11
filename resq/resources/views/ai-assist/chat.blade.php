@@ -168,7 +168,7 @@
                         <div id="conversationInfo" class="flex items-center gap-1.5 text-[10px] text-slate-500">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span class="hidden sm:inline">ID:</span>
-                            <span id="conversationId" class="font-mono">-</span>
+                            {{-- <span id="conversationId" class="font-mono">-</span> --}}
                             <span id="responseTime" class="hidden ml-2">
                                 · <span id="responseTimeValue" class="text-emerald-400 font-medium">-</span>s
                             </span>
@@ -195,7 +195,7 @@
             const errorText = document.getElementById('errorText');
             const dismissError = document.getElementById('dismissError');
             const newChatBtn = document.getElementById('newChatBtn');
-            const conversationIdEl = document.getElementById('conversationId');
+            // const conversationIdEl = document.getElementById('conversationId');
             const responseTimeEl = document.getElementById('responseTime');
             const responseTimeValue = document.getElementById('responseTimeValue');
             const charCount = document.getElementById('charCount');
@@ -304,7 +304,7 @@
                     if (data.success) {
                         addMessage('assistant', data.reply);
                         conversationId = data.conversation_id;
-                        conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
+                        // conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                         if (data.response_time) {
                             responseTimeEl.classList.remove('hidden');
                             responseTimeValue.textContent = data.response_time;
@@ -372,7 +372,7 @@
 
             function generateNewConversation() {
                 conversationId = 'conv_' + Math.random().toString(36).substring(2, 18);
-                conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
+                // conversationIdEl.textContent = conversationId.substring(0, 12) + '…';
                 responseTimeEl.classList.add('hidden');
             }
 
