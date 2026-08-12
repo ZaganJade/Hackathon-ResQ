@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Webhook;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Webhook\Concerns\AuthenticatesWebhookRequests;
 use App\Jobs\SendWhatsAppNotificationJob;
 use App\Models\NotificationLog;
 use App\Services\ExternalApi\WhatsAppService;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 class WhatsAppWebhookController extends Controller
 {
+    use AuthenticatesWebhookRequests;
+
     private WhatsAppService $whatsAppService;
 
     public function __construct(WhatsAppService $whatsAppService)
@@ -198,30 +201,6 @@ class WhatsAppWebhookController extends Controller
                 'message' => $e->getMessage(),
             ], 503);
         }
-    }
-
-    /**
-     * Authenticate webhook request
-     */
-    private function authenticate(Request $request): bool
-    {
-        $apiKey = $request->header('X-API-Key');
-
-        if (empty($apiKey)) {
-            return false;
-        }
-
-        // Get valid API keys from config
-        $validKeys = config('services.webhook.api_keys', []);
-
-        // For single key setup (backward compatibility)
-        $primaryKey = config('services.webhook.api_key');
-        if ($primaryKey && $apiKey === $primaryKey) {
-            return true;
-        }
-
-        // For multiple keys setup
-        return in_array($apiKey, $validKeys, true);
     }
 
     /**

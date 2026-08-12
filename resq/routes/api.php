@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LocationRiskController;
+use App\Http\Controllers\Webhook\DisasterWebhookController;
 use App\Http\Controllers\Webhook\WhatsAppWebhookController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,10 @@ Route::prefix('v1/webhook')->group(function () {
         Route::get('/status', [WhatsAppWebhookController::class, 'status'])
             ->name('api.webhook.whatsapp.status');
     });
+
+    // Disaster ingest endpoint (used by the BMKG Cloudflare Worker)
+    Route::post('/disasters', [DisasterWebhookController::class, 'store'])
+        ->name('api.webhook.disasters.store');
 
 });
 
