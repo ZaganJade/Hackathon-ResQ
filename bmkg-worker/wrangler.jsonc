@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "bmkg-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+
+  // Public config. RESQ_WEBHOOK_API_KEY is a secret instead — set it with
+  // `wrangler secret put RESQ_WEBHOOK_API_KEY` (see README.md).
+  "vars": {
+    "RESQ_API_URL": "https://resq-blue.vercel.app"
+  },
+
+  // Run `wrangler kv namespace create BMKG_STATE` and paste the returned id
+  // here before deploying. Stores a single key: the last-seen earthquake
+  // fingerprint, so repeat cron ticks don't re-notify for the same event.
+  "kv_namespaces": [
+    { "binding": "BMKG_STATE", "id": "314c0128f30448da96551fcbc2a261c2" }
+  ],
+
+  // Every 5 minutes. Adjust as needed (Cloudflare Cron Triggers support
+  // down to 1-minute intervals).
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
