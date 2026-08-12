@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
 BMKG Earthquake Data Scraper
+
+DEPRECATED: superseded by the Cloudflare Worker in ../bmkg-worker/, which
+scrapes the same page on a Cron Trigger and reports new earthquakes to the
+Laravel app's POST /api/v1/webhook/disasters endpoint (persistence +
+notification handled there via NotificationService::notifyForDisaster()).
+
+Kept here for reference only. Known-broken as-is: imports `pymysql` and
+calls its MySQL-only API (pymysql.connect, cursor.lastrowid) against what is
+actually a Postgres database, `pymysql` isn't even declared in
+requirements.txt, and even a fixed psycopg2 connection here has no
+`search_path` for the app's `resq` schema. Do not rely on this script.
+
 Scrapes real-time earthquake data from https://www.bmkg.go.id/gempabumi/gempabumi-realtime
 and returns results as JSON with properly parsed data types.
 """
